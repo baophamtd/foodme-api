@@ -2,7 +2,7 @@ var AWS = require("aws-sdk");
 var fs = require('fs');
 
 AWS.config.update({
-    region: "us-west-2",
+    region: "us-west-1",
     endpoint: "http://localhost:8000"
 });
 
@@ -15,16 +15,16 @@ allMovies.forEach(function(user) {
     var params = {
         TableName: "Users",
         Item: {
-            "username":  user.username,
-            "email": user.email
+            "user-id":  user.userid,
+            "access-token": user.accesstoken
         }
     };
 
     docClient.put(params, function(err, data) {
        if (err) {
-           console.error("Unable to add movie", user.username, ". Error JSON:", JSON.stringify(err, null, 2));
+           console.error("Unable to add movie", user.userid, ". Error JSON:", JSON.stringify(err, null, 2));
        } else {
-           console.log("PutItem succeeded:", user.username);
+           console.log("PutItem succeeded:", user.userid);
        }
     });
 });

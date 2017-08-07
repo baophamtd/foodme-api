@@ -10,10 +10,34 @@ AWS.config.update({
 
 var dynamodb = new AWS.DynamoDB();
 
+var table = "Users";
+
+var userid = "bpham";
+
+var params = {
+    TableName: table,
+    Key:{
+      "user-id": {
+        S: "bpham"
+      }
+    }
+};
+
 app.get('/', function (req, res) {
   res.send('Please use /api/users route to use the api')
-})
+});
+
+app.get('/api/users', function (req, res){
+  dynamodb.getItem(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+            res.send(data);
+        }
+  });
+});
 
 app.listen(3000, function () {
   console.log('App is running on http://localhost:3000')
-})
+});
