@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/baophamtd/foodme-api#readme",
   "dependencies": {
-    "express": "^4.15.3",
+    "apn": "^2.1.5",
+    "aws-sdk": "*",
     "body-parser": "*",
-    "aws-sdk": "*"
+    "express": "^4.15.3"
   }
 }

@@ -1,7 +1,8 @@
 const express = require('express')
 const app = express()
 
-var AWS = require("aws-sdk");
+/*var AWS = require("aws-sdk");
+
 
 AWS.config.update({
   region: "us-west-1",
@@ -22,21 +23,40 @@ var params = {
       }
     }
 };
+*/
+var apn = require('apn');
+
+var options = {
+  token: {
+    key: "/Users/baopham/Downloads/AuthKey_95NSBW5727.p8",
+    keyId: "95NSBW5727",
+    teamId: "2NAQTY7EQ3"
+  },
+  production: false
+};
+
+var apnProvider = new apn.Provider(options);
 
 app.get('/', function (req, res) {
-  res.send('Please use /api/users route to use the api')
+  var deviceToken = req.param('token');
+  if(deviceToken){
+    var note = new apn.Notification();
+
+    note.expiry = 0; // Expires 1 hour from now.
+    note.badge = 0;
+    note.sound = "ping.aiff";
+    note.alert = "New Event Detected";
+    note.payload = {'messageFrom': 'NEDP'};
+    note.topic = "com.ehuman.nedp";
+
+    apnProvider.send(note, deviceToken).then( (result) => {
+      console.log(result.failed);
+    });
+  }else{
+    res.send("Please specify device token!");
+  }
 });
 
-app.get('/api/users', function (req, res){
-  dynamodb.getItem(params, function(err, data) {
-        if (err) {
-            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-        } else {
-            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-            res.send(data);
-        }
-  });
-});
 
 app.listen(3000, function () {
   console.log('App is running on http://localhost:3000')
