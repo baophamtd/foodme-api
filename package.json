@@ -5,7 +5,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node server/app.js",
+    "start": "NODE_ENV=local node server/app.js",
+    "windows": "node server/app.js",
     "test" : ""
   },
   "repository": {
