@@ -7,8 +7,8 @@ const router = express.Router();
 
 //Start the dynamodb server
 if(config.ENV === "local") {
-    let localDynamo = require('local-dynamo')
-    localDynamo.launch('./dynamodb', config.DYNAMO.PORT)
+    let localDynamo = require('local-dynamo');
+    localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
 }
 
 //add router

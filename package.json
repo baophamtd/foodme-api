@@ -7,6 +7,7 @@
   "scripts": {
     "start": "NODE_ENV=local node server/app.js",
     "windows": "node server/app.js",
+    "migrate" : "node migrations/run.js",
     "test" : ""
   },
   "repository": {
