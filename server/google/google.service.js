@@ -10,8 +10,16 @@ class googleService {
         
     }
 
+    generatePhotoUrls({photos, maxWidth, maxHeight}) {
+        return photos.map(photo => {
+            let id = photo.photo_reference;
+            return `${apiEndPoint}/photo?maxwidth=${maxWidth}&maxheight=${maxHeight}&photoreference=${id}&key=${apiKey}`;	                
+        });
+    }
+
     getPlaces({lng, lat, radius, minPrice, maxPrice}) {
         let type = "restaurant";
+
         let query = {
             key : apiKey,
             location : `${lat},${lng}`,
@@ -23,7 +31,6 @@ class googleService {
         }
 
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
-		console.log(url);
         return fetch(url)
             .then(res => res.json());
     }
