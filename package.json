@@ -5,10 +5,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=local node server/app.js",
-    "windows": "node server/app.js",
-    "migrate" : "node migrations/run.js",
-    "test" : ""
+    "start": "NODE_ENV=local nodemon server/server.js",
+    "windows": "nodemon server/server.js",
+    "migrate": "node migrations/run.js",
+    "test": ""
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,15 @@
   },
   "homepage": "https://github.com/baophamtd/foodme-api#readme",
   "dependencies": {
+    "@google/maps": "^0.4.5",
     "aws-sdk": "*",
-    "body-parser": "*",
-    "express": "^4.16.2"
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "fetch": "^1.1.0",
+    "node-fetch": "^1.7.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.8",
+    "local-dynamo": "^0.5.0"
   }
 }
