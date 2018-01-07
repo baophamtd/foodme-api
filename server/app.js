@@ -1,47 +1,17 @@
-const express = require('express')
-const app = express()
+config = require('../config');
 
-var AWS = require("aws-sdk");
+//external libs
+const express = require('express');
+const app = express();
+const router = express.Router();
 
-//Run dynamodb as the same time
-var localDynamo = require('local-dynamo')
-localDynamo.launch('/Users/baopham/dynamodb_local_latest/', 8000)
+//Start the dynamodb server
+if(config.ENV === "local") {
+    let localDynamo = require('local-dynamo')
+    localDynamo.launch('./dynamodb', config.DYNAMO.PORT)
+}
 
-AWS.config.update({
-  region: "us-west-1",
-  endpoint: "http://localhost:8000"
-});
+//add router
+app.use('/api', require('./routes'));
 
-var dynamodb = new AWS.DynamoDB();
-
-var table = "Users";
-
-var userid = "bpham";
-
-var params = {
-    TableName: table,
-    Key:{
-      "user-id": {
-        S: "bpham"
-      }
-    }
-};
-
-app.get('/', function (req, res) {
-  res.send('Please use /api/users route to use the api')
-});
-
-app.get('/api/users', function (req, res){
-  dynamodb.getItem(params, function(err, data) {
-        if (err) {
-            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-        } else {
-            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-            res.send(data);
-        }
-  });
-});
-
-app.listen(3000, function () {
-  console.log('App is running on http://localhost:3000')
-});
+app.listen(config.SERVER.PORT, () => console.log(`Example app listening on port ${config.SERVER.PORT}`))

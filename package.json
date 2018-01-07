@@ -5,7 +5,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_ENV=local node server/app.js",
+    "windows": "node server/app.js",
+    "test" : ""
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,6 @@
   "dependencies": {
     "aws-sdk": "*",
     "body-parser": "*",
-    "express": "^4.16.2",
-    "local-dynamo": "^0.5.0"
+    "express": "^4.16.2"
   }
 }

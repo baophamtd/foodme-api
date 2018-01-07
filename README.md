@@ -7,6 +7,7 @@ Requirements
 Unordered list:
 
   * AWS-SDK and install DynamoDB at: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html
+  ~~Download directoy rename it to dynamodb and place it in the root project directory~~
   * Express.js
   * Bodyparses
 
