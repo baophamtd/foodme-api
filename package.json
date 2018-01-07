@@ -20,6 +20,7 @@
   "dependencies": {
     "aws-sdk": "*",
     "body-parser": "*",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "local-dynamo": "^0.5.0"
   }
 }
