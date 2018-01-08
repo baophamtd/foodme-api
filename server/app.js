@@ -14,4 +14,4 @@ if(config.ENV === "local") {
 //add router
 app.use('/api', require('./routes'));
 
-app.listen(config.SERVER.PORT, () => console.log(`Example app listening on port ${config.SERVER.PORT}`))
+app.listen(config.SERVER.PORT, () => console.log(`foodme listening on port ${config.SERVER.PORT}`))
