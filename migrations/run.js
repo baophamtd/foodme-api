@@ -1,17 +1,10 @@
-let AWS = require("aws-sdk");
-let config = require('../config/local');
+config = require('../config/local');
 
 //Start the dynamodb instance
-let localDynamo = require('local-dynamo');
+const localDynamo = require('local-dynamo');
 localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
 
-//Configure AWS
-AWS.config.update({
-  region: config.DYNAMO.REGION,
-  endpoint: `${config.DYNAMO.ENDPOINT}:${config.DYNAMO.PORT}`
-});
-
-var dynamodb = new AWS.DynamoDB();
+const dynamodb = require('../server/aws/dynamo.connector');
 
 //Load table schemas
 let schemas = [

@@ -1,15 +1,16 @@
 const googleServiceClass = require('../google/google.service');
+const restaurantServiceClass = require('./restaurant.service');
 const googleService = new googleServiceClass();
+const restaurantService = new restaurantServiceClass();
 
 class restaurantController {
     constructor() {
-        this.calculateRadius = this.calculateRadius.bind(this);
         this.getRestaurants = this.getRestaurants.bind(this);
     }
 
     getRestaurants(req, res) {
         let {lat, lng, minPrice, maxPrice, radiusMiles, radiusKilometers, maxHeight, maxWidth, minRating} = req.query;
-        let radius = this.calculateRadius({radiusMiles, radiusKilometers});
+        let radius = this.calculateRadius(radiusMiles, radiusKilometers);
         googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
             .then(json => json.results)
             .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
@@ -18,14 +19,22 @@ class restaurantController {
             .catch(err => {
                 console.error("Failed to retrieve restaurants", err);
                 res.send("Failed to retrieve restaurants").status(400);
-            })       
+            })      
     }
-    
-	calculateRadius({radiusMiles, radiusKilometers})  {
-		if(radiusMiles) return radiusMiles * 1609.34; 
-		if(radiusKilometers) return radiusKilometers * 1000;
-		return 1500.0;
-	}
+
+    getRestaurants(req, res) {
+        
+    }
+
+    createRestaurant(req, res) {
+
+    }
+}
+
+function calculateRadius(radiusMiles, radiusKilometers)  {
+    if(radiusMiles) return radiusMiles * 1609.34; 
+    if(radiusKilometers) return radiusKilometers * 1000;
+    return 1500.0;
 }
 
 function filterRestaurants(restaurants, minPrice, maxPrice, minRating) {
