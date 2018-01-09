@@ -31,6 +31,7 @@ class googleService {
         }
 
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
+        
         return fetch(url)
             .then(res => res.json());
     }
