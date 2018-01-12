@@ -7,6 +7,6 @@ const restaurantController = new require('./restaurant.controller');
 //Controllers
 const controller = new restaurantController();
 
-router.get('/', controller.getRestaurants)
+router.get('/', controller.getRestaurants);
 
 module.exports = router;

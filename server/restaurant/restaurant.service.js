@@ -8,7 +8,7 @@ class restaurantService {
     }
 
     createRestaurant(restaurant) {
-        
+
     }
 
     getRestaurant(restaurant) {
@@ -16,10 +16,10 @@ class restaurantService {
     }
 
     deleteRestaurant(restaurant) {
-        
+
     }
 
 
 }
 
-module.exports = restaurantService;
+module.exports = new restaurantService();

@@ -7,13 +7,21 @@ const apiKey = config.GOOGLE.MAPS.API_KEY;
 
 class googleService {
     constructor() {
-        
+
     }
 
     generatePhotoUrls({photos, maxWidth, maxHeight}) {
         return photos.map(photo => {
             let id = photo.photo_reference;
-            return `${apiEndPoint}/photo?maxwidth=${maxWidth}&maxheight=${maxHeight}&photoreference=${id}&key=${apiKey}`;	                
+
+            let query = {
+                photoreference:id,
+                key: apiKey,
+                maxwidth: maxWidth || 1000,
+                maxheight: maxHeight || 1000
+            };
+
+            return `${apiEndPoint}/photo?${querystring.stringify(query)}`;
         });
     }
 
@@ -28,13 +36,13 @@ class googleService {
             keyword : "",
             minPrice,
             maxPrice
-        }
+        };
 
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
-        
+
         return fetch(url)
             .then(res => res.json());
     }
 }
 
-module.exports = googleService;
+module.exports = new googleService();
