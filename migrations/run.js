@@ -1,7 +1,7 @@
 config = require('../config/local');
 
-//Start the dynamodb instance
-const localDynamo = require('local-dynamo');
+//Start dynamodb
+let localDynamo = require('local-dynamo');
 localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
 
 const dynamodb = require('../server/aws/dynamo.connector');
@@ -12,10 +12,10 @@ let schemas = [
     require('./restaurants.table')
 ]
 
-console.log("Beggining Migrations");
+console.log("Beginning migrations...");
 
 //Create each table
-schemas.forEach(table => { 
+schemas.forEach(table => {
     console.log(`Migrating ${table.TableName}`, table);
     dynamodb.createTable(table, function(err, data) {
         if (err) {

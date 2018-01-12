@@ -1,7 +1,7 @@
 let dynamoConnector = require('../aws/dynamo.document.connector');
 
-class restaurantModel { 
-    
+class restaurantModel {
+
     createRestaurant() {
         return new Promise((resolve, reject) => {
             dynamoConnector.get(query, function(err, data) {

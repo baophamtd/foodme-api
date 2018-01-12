@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const querystring = require('querystring');
 const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
-const apiKey = config.GOOGLE.MAPS.API_KEY;
+const apiToken = config.GOOGLE.MAPS.API_TOKEN;
 
 class googleService {
     constructor() {
@@ -16,7 +16,7 @@ class googleService {
 
             let query = {
                 photoreference:id,
-                key: apiKey,
+                key: apiToken,
                 maxwidth: maxWidth || 1000,
                 maxheight: maxHeight || 1000
             };
@@ -29,7 +29,7 @@ class googleService {
         let type = "restaurant";
 
         let query = {
-            key : apiKey,
+            key : apiToken,
             location : `${lat},${lng}`,
             radius,
             type,

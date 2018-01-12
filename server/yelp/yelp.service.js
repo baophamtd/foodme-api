@@ -3,6 +3,11 @@ class yelpService {
     constuctor() {
         
     }
+
+    retrieveApiKey() {
+        let url = "";
+        return fetch()
+    }
 }
 
-module.exports = yelpService;
+module.exports = new yelpService();
