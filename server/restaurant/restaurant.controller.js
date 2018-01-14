@@ -1,6 +1,6 @@
 const googleService = require('../google/google.service');
 const restaurantService = require('./restaurant.service');
-
+const restHelper = require('../rest/rest.helper');
 class restaurantController {
     constructor() {
         this.getRestaurants = this.getRestaurants.bind(this);
@@ -15,6 +15,7 @@ class restaurantController {
             .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
             .then(restaurants => reduceRestaurants(restaurants, maxHeight, maxWidth))
             .then(restaurants => res.send(restaurants))
+            .then(restaurants => batchCreateRestaurants)
             .catch(err => {
                 logger.error("Failed to retrieve restaurants", err);
                 res.send("Failed to retrieve restaurants").status(400);
@@ -22,7 +23,17 @@ class restaurantController {
     }
 
     getRestaurant(req, res) {
-
+        let {id} = req.params;
+        restaurantService.getRestaurant(id)
+            .then(restaurant => {
+                if(restaurant)
+                    res.send(restHelper.buildResponse(null, restaurant));
+                else                    
+                    res.send(restHelper.buildResponse(null, [])).status(404);    
+            })
+            .catch(err => {                
+                res.send(restHelper.buildResponse(err, [])).status(500);
+            });
     }
 
     createRestaurant(req, res) {
@@ -34,6 +45,12 @@ function calculateRadius(radiusMiles, radiusKilometers)  {
     if(radiusMiles) return radiusMiles * 1609.34;
     if(radiusKilometers) return radiusKilometers * 1000;
     return 1500.0;
+}
+
+function batchCreateRestaurants(restaurants) {
+    return Promise.map(restaurant => {
+        restaurantService.createRestaurant(rest)
+    })
 }
 
 function filterRestaurants(restaurants, minPrice, maxPrice, minRating) {
@@ -50,9 +67,10 @@ function reduceRestaurants(restaurants, maxHeight, maxWidth) {
     return restaurants.map(restaurant => {
         let photos = googleService.generatePhotoUrls({photos: restaurant.photos, maxHeight, maxWidth});
         return {
-            location : restaurant.geometry.location,
-            icon : restaurant.icon,
-            photos : photos,
+            id: restaurant.id,
+            location: restaurant.geometry.location,
+            icon: restaurant.icon,
+            photos: photos,
             name: restaurant.name,
             rating: restaurant.rating
         }
