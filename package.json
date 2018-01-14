@@ -23,11 +23,13 @@
   "dependencies": {
     "@google/maps": "^0.4.5",
     "aws-sdk": "*",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "dynasty": "^0.3.8",
     "express": "^4.16.2",
     "fetch": "^1.1.0",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^1.7.3",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^1.14.8",

@@ -1,25 +1,25 @@
-let restaurantModelClass = require('./restaurant.model');
-let restaurantModel = new restaurantModelClass();
+const restaurantModel = require('./restaurant.model');
+const Promise = require("bluebird");
 
 class restaurantService {
 
     constructor() {
 
-    }
+    }    
 
     createRestaurant(restaurant) {
-        
-    }
-
-    getRestaurant(restaurant) {
         return restaurantModel.createRestaurant(restaurant);
     }
 
+    getRestaurant(restaurant) {
+        return restaurantModel.getRestaurant(restaurant);
+    }
+
     deleteRestaurant(restaurant) {
-        
+
     }
 
 
 }
 
-module.exports = restaurantService;
+module.exports = new restaurantService();

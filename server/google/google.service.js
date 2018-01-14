@@ -3,17 +3,25 @@ const fetch = require('node-fetch');
 const querystring = require('querystring');
 const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
-const apiKey = config.GOOGLE.MAPS.API_KEY;
+const apiToken = config.GOOGLE.MAPS.API_TOKEN;
 
 class googleService {
     constructor() {
-        
+
     }
 
     generatePhotoUrls({photos, maxWidth, maxHeight}) {
         return photos.map(photo => {
             let id = photo.photo_reference;
-            return `${apiEndPoint}/photo?maxwidth=${maxWidth}&maxheight=${maxHeight}&photoreference=${id}&key=${apiKey}`;	                
+
+            let query = {
+                photoreference:id,
+                key: apiToken,
+                maxwidth: maxWidth || 1000,
+                maxheight: maxHeight || 1000
+            };
+
+            return `${apiEndPoint}/photo?${querystring.stringify(query)}`;
         });
     }
 
@@ -21,20 +29,20 @@ class googleService {
         let type = "restaurant";
 
         let query = {
-            key : apiKey,
+            key : apiToken,
             location : `${lat},${lng}`,
             radius,
             type,
             keyword : "",
             minPrice,
             maxPrice
-        }
+        };
 
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
-        
+
         return fetch(url)
             .then(res => res.json());
     }
 }
 
-module.exports = googleService;
+module.exports = new googleService();

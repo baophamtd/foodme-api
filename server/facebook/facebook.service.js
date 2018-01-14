@@ -1,24 +1,25 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
-const apiKey = config.FACEBOOK.API_TOKEN;
+const apiToken = config.FACEBOOK.API_TOKEN;
+const apiEndPoint = config.FACEBOOK.END_POINT;
 
 class facebookService {
 
   verifyAccessToken(token){
     let query = {
-      access_token : apiKey,
+      access_token : apiToken,
       input_token : token
     }
 
-    let url = `https://graph.facebook.com/debug_token?${querystring.stringify(query)}`;
+    let url = `${apiEndPoint}/debug_token?${querystring.stringify(query)}`;
 
     return fetch(url)
       .then(result => result.json())
       .then(json => {
-        console.log(json);
         if(json.data.is_valid) {
           return true;
         }
+        logger.log(json);
         return false;
       });
   }

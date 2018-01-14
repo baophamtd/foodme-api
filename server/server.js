@@ -1,4 +1,5 @@
 config = require('../config');
+logger = require('winston');
 
 //Libs
 const express = require('express');

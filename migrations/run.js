@@ -1,5 +1,9 @@
 config = require('../config/local');
 
+//Start dynamodb
+let localDynamo = require('local-dynamo');
+localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
+
 const dynamodb = require('../server/aws/dynamo.connector');
 
 //Load table schemas

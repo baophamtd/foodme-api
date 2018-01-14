@@ -7,7 +7,7 @@ let restaurantRouter = require('./restaurant/restaurant.routes');
 
 //Attach routers
 router.use('/user', userRouter);
-router.use('/restaurants', restaurantRouter);
+router.use('/restaurant', restaurantRouter);
 
 
 module.exports = router;

@@ -1,21 +1,19 @@
-let dynamoConnector = require('../aws/dynamo.document.connector');
+let db = require('../aws/dynamo.dynasty.connector');
+let restaurants = db.table('Restaurants');
 
 class restaurantModel {
 
-    createRestaurant() {
+    constructor() {
 
+    }
+
+    createRestaurant(restaurant) {       
+        return restaurants.insert(restaurant);
     }
 
     getRestaurant(query) {
-        return new Promise((resolve, reject) => {
-            dynamoConnector.get(query, function(err, data) {
-                if(err) {
-                    reject(err);
-                }
-                resolve(data);
-            });
-        });
+        return restaurants.find(query);
     }
 }
 
-module.exports = restaurantModel;
+module.exports = new restaurantModel();
