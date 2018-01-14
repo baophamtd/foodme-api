@@ -7,7 +7,8 @@ class userModel {
      * @params user:User object
      */
     createUser(user) {
-
+      user = new User();
+      log.log(user);
     }
 /*
     //user's info
