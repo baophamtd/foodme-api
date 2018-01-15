@@ -1,20 +1,46 @@
-
 class Restaurant {
-  constuctor({
-      name,
-      country,
-      state,
-      city,
-      lat,
-      lng,
-      type,
+  constructor({
+    id,
+    name,
+    country,
+    state,
+    city,
+    address,
+    zip,
+    photos,
+    price,
+    rating,
+    //lat, lng
+    location,
+    types,
+    categories,
 
-      //Social info
-      likes,
-      dislikes,
-      views,
-      visits
-  }){}
+    //Social info
+    favorited,
+    likes,
+    dislikes,
+    views,
+    visits
+  }) {
+    this.id = id;
+    this.name = name;
+    this.country = country || null;
+    this.state = state || null;
+    this.city = city || null;
+    this.zip = zip || null;
+    this.address = address || null;
+    this.price = price || 0;
+    this.rating = rating || 0;
+    this.photos = photos || ["No Photos"];
+    this.location = location;
+    this.types = types || [];
+    this.categories = categories || [];
+    this.favorited = favorited || 0;
+    this.likes = likes || 0;
+    this.dislikes = dislikes || 0;
+    this.views = views || 0;
+    this.visits = visits || 0;
+  }
 }
 
 module.exports = Restaurant;

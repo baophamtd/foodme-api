@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const restaurantModel = require('./restaurant.model');
 const googleService = require('../google/google.service');
 const yelpService = require('../yelp/yelp.service');
-
+const Restaurant = require('./restaurant.object');
 class restaurantService {
 
     constructor() {
@@ -20,6 +20,27 @@ class restaurantService {
 
     deleteRestaurant(restaurant) {
 
+    }
+
+    favoritedRestaurant(id) {
+        return restaurantModel.getRestaurant(id)
+            .then(restaurant => {
+                return restaurantModel.updateRestaurant(id, {favorited: restaurant.favorited + 1});
+            });
+    }
+
+    likeRestaurant(id) {
+        return restaurantModel.getRestaurant(id)
+            .then(restaurant => {
+                return restaurantModel.updateRestaurant(id, {likes: restaurant.likes + 1});
+            });
+    }
+
+    dislikeRestaurant(id) {
+        return restaurantModel.getRestaurant(id)
+        .then(restaurant => {
+            return restaurantModel.updateRestaurant(id, {dislikes: restaurant.dislikes + 1});
+        });
     }
 
     searchForRestaurants({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth}) {
@@ -50,17 +71,21 @@ function mergeSearchResults(results) {
         let key = keyRestaurant(restaurant.location.lat, restaurant.location.lng);
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
-            return {
+            return new Restaurant({
                 id: restaurant.id,
                 name: restaurant.name,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
-                icon: restaurant.icon,
+                icon: restaurant.icon,                
+                city: restaurant.city,
+                country: restaurant.country,
+                state: restaurant.state,
+                zip: restaurant.zip_code,
                 location: restaurant.location,
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
                 types: restaurant.types,
                 price: restaurant.price || redundantRestaurant.price,
                 categories: redundantRestaurant.categories
-            }
+            })
 
             delete dictYelp[key]
         } else {
@@ -79,10 +104,16 @@ function mergeSearchResults(results) {
 
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-        return {
+        console.log(restaurant);
+        return new Restaurant({
             id: crypto.randomBytes(40).toString('hex'),
             name: restaurant.name,
             photos: [restaurant.image_url || "No Photo"],
+            city: restaurant.location.city,
+            country: restaurant.location.country,
+            state: restaurant.location.state,
+            address: restaurant.location.address1,
+            zip: restaurant.location.zip_code,
             location: {
                 lat: restaurant.coordinates.latitude,
                 lng: restaurant.coordinates.longitude
@@ -90,14 +121,14 @@ function yelpReduceRestaurants(restaurants) {
             price: restaurant.price.length || 0,
             rating: restaurant.rating, 
             categories: restaurant.categories
-        }
+        })
     });
 }
 
 function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
     return restaurants.map(restaurant => {
         let photos = googleService.generatePhotoUrls({photos: restaurant.photos, maxHeight, maxWidth});
-        return {
+        return new Restaurant({
             id: restaurant.id,
             location: {                
                 lat: restaurant.geometry.location.lat,
@@ -105,11 +136,12 @@ function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
             },
             price: restaurant.price_level || 0,
             icon: restaurant.icon,
+            address: restaurant.vicinity,
             photos: photos,
             name: restaurant.name,
             rating: restaurant.rating,
             types: restaurant.types
-        }
+        });
     });
 }
 

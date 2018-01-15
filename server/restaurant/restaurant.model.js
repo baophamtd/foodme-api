@@ -7,6 +7,10 @@ class restaurantModel {
 
     }
 
+    updateRestaurant(id, update) {
+        return restaurants.update(id, update);
+    }
+
     createRestaurant(restaurant) {       
         return restaurants.insert(restaurant);
     }

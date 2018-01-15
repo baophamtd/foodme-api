@@ -7,12 +7,45 @@ class restaurantController {
         this.getRestaurants = this.getRestaurants.bind(this);
     }
 
+    likeRestaurant(req, res) {
+        let {id} = req.params;
+        restaurantService.likeRestaurant(id)
+            .then(result => {
+                res.send("Succes");
+            })
+            .catch(err => {
+                res.send("Failed " + err).status(400);
+            })
+    }
+    
+    dislikeRestaurant(req, res) {
+        let {id} = req.params;
+        restaurantService.dislikeRestaurant(id)
+            .then(result => {
+                res.send("Succes");
+            })
+            .catch(err => {
+                res.send("Failed " + err).status(400);
+            })
+    }
+    
+    favoriteRestaurant(req, res) {
+        let {id} = req.params;
+        restaurantService.favoriteRestaurant(id)
+            .then(result => {
+                res.send("Succes");
+            })
+            .catch(err => {
+                res.send("Failed").status(400);
+            })
+    }
+
     getRestaurants(req, res) {
         let {lat, lng, minPrice, maxPrice, radiusMiles, radiusKilometers, maxHeight, maxWidth, minRating} = req.query;
         let radius = calculateRadius(radiusMiles, radiusKilometers);       
 
         restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
-            .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
+           // .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
             .then(restaurants => {
                 res.send(restaurants);
                 

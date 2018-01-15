@@ -10,4 +10,8 @@ const controller = new restaurantController();
 router.get('/search', controller.getRestaurants);
 router.get('/:id', controller.getRestaurant);
 
+router.post('/like/:id', controller.likeRestaurant);
+router.post('/dislike/:id', controller.dislikeRestaurant);
+router.post('/favorite/:id', controller.favoriteRestaurant);
+
 module.exports = router;
