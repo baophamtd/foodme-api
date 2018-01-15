@@ -1,4 +1,5 @@
-let dynamoConnector = require('../aws/dynamo.document.connector');
+let db = require('../aws/dynamo.dynasty.connector');
+let users = db.table('Users');
 let User = require('./user.object')
 
 class userModel {
@@ -8,7 +9,11 @@ class userModel {
      */
     createUser(user) {
       user = new User();
-      log.log(user);
+      console.log("USER:"+ user);
+      users.insert(user)
+      .catch(function (error){
+        console.log(error);
+      });
     }
 /*
     //user's info
@@ -42,4 +47,4 @@ class userModel {
     }
 }
 
-module.exports = restaurantModel;
+module.exports = new userModel();
