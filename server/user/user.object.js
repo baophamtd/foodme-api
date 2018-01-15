@@ -19,7 +19,10 @@ class User {
 
       //list of restaurant id's
       restaurantList
-    }) {}
+    }) {
+      console.log(firstName);
+      this.firstName = firstName;
+    }
 }
 
 module.exports = User;

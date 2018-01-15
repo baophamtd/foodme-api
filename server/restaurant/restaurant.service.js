@@ -114,7 +114,7 @@ function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
 }
 
 function keyRestaurant(lat, lng) {
-    return `${Number(lat).toFixed(3))}${Number((lng).toFixed(3))}`; 
+    return `${Number(lat).toFixed(3)}${Number(lng).toFixed(3)}`; 
 }
 
 
