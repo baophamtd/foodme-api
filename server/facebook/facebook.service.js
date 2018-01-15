@@ -16,7 +16,7 @@ class facebookService {
     return fetch(url)
       .then(result => result.json())
       .then(json => {
-        if(json.data.is_valid) {
+        if(json.data && json.data.is_valid) {
           return true;
         }
         logger.log(json);

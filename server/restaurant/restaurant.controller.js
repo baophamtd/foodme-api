@@ -34,10 +34,10 @@ class restaurantController {
             .then(restaurant => {
                 if(restaurant)
                     res.send(restHelper.buildResponse(null, restaurant));
-                else                    
-                    res.send(restHelper.buildResponse(null, [])).status(404);    
+                else
+                    res.send(restHelper.buildResponse(null, [])).status(404);
             })
-            .catch(err => {                
+            .catch(err => {
                 res.send(restHelper.buildResponse(err, [])).status(500);
             });
     }

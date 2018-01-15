@@ -14,14 +14,23 @@ class User {
       //access token
       facebookToken,
 
-      //json web token
-      foodmeToken,
+      //array json web token
+      foodmeTokens,
 
       //list of restaurant id's
       restaurantList
     }) {
-      console.log(firstName);
+      this.id = id;
       this.firstName = firstName;
+      this.lastName = lastName;
+      this.gender = gender;
+      this.country = country || null;
+      this.city = city || null;
+      this.age = age || -1;
+      this.birthday = birthday || null;
+      this.facebookToken = facebookToken || null;
+      this.foodmeTokens = foodmeTokens || [];
+      this.restaurantList = restaurantList || []
     }
 }
 
