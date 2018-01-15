@@ -11,18 +11,21 @@ class googleService {
     }
 
     generatePhotoUrls({photos, maxWidth, maxHeight}) {
-        return photos.map(photo => {
-            let id = photo.photo_reference;
+        if(photos)
+            return photos.map(photo => {
+                let id = photo.photo_reference;
 
-            let query = {
-                photoreference:id,
-                key: apiToken,
-                maxwidth: maxWidth || 1000,
-                maxheight: maxHeight || 1000
-            };
+                let query = {
+                    photoreference:id,
+                    key: apiToken,
+                    maxwidth: maxWidth || 1000,
+                    maxheight: maxHeight || 1000
+                };
 
-            return `${apiEndPoint}/photo?${querystring.stringify(query)}`;
-        });
+                return `${apiEndPoint}/photo?${querystring.stringify(query)}` || "No Photo";
+            });
+        else    
+            return ["No Photo"];
     }
 
     getPlaces({lng, lat, radius, minPrice, maxPrice}) {

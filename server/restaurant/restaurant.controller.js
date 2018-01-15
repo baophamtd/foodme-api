@@ -1,6 +1,7 @@
-const googleService = require('../google/google.service');
 const restaurantService = require('./restaurant.service');
 const restHelper = require('../rest/rest.helper');
+const Promise = require('bluebird');
+
 class restaurantController {
     constructor() {
         this.getRestaurants = this.getRestaurants.bind(this);
@@ -8,14 +9,19 @@ class restaurantController {
 
     getRestaurants(req, res) {
         let {lat, lng, minPrice, maxPrice, radiusMiles, radiusKilometers, maxHeight, maxWidth, minRating} = req.query;
-        let radius = calculateRadius(radiusMiles, radiusKilometers);
+        let radius = calculateRadius(radiusMiles, radiusKilometers);       
 
-        googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
-            .then(json => json.results)
+        restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
             .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
-            .then(restaurants => reduceRestaurants(restaurants, maxHeight, maxWidth))
-            .then(restaurants => res.send(restaurants))
-            .then(restaurants => batchCreateRestaurants)
+            .then(restaurants => {
+                res.send(restaurants);
+                
+                batchCreateRestaurants(restaurants)
+                    .catch(err => {
+                        logger.error("Failed to insert restaurants database", err);
+                    })
+            })
+            .then(done => logger.info("Finished inserting restaurants into the DB"))
             .catch(err => {
                 logger.error("Failed to retrieve restaurants", err);
                 res.send("Failed to retrieve restaurants").status(400);
@@ -48,32 +54,19 @@ function calculateRadius(radiusMiles, radiusKilometers)  {
 }
 
 function batchCreateRestaurants(restaurants) {
-    return Promise.map(restaurant => {
-        restaurantService.createRestaurant(rest)
+    return Promise.map(restaurants, restaurant => {
+        restaurantService.createRestaurant(restaurant)
+            .catch(err => { logger.error("Failed to write restaurant to database.", restaurant)})
     })
 }
 
 function filterRestaurants(restaurants, minPrice, maxPrice, minRating) {
     return restaurants.filter(restaurant => {
-        let price = restaurant.price_level;
-        if(price >= minPrice && price <= maxPrice && restaurant.rating >= minRating) {
+        let price = restaurant.price;
+        if((price >= minPrice || price == 0) && price <= maxPrice && restaurant.rating >= minRating) {
             return true;
         }
         return false;
-    });
-}
-
-function reduceRestaurants(restaurants, maxHeight, maxWidth) {
-    return restaurants.map(restaurant => {
-        let photos = googleService.generatePhotoUrls({photos: restaurant.photos, maxHeight, maxWidth});
-        return {
-            id: restaurant.id,
-            location: restaurant.geometry.location,
-            icon: restaurant.icon,
-            photos: photos,
-            name: restaurant.name,
-            rating: restaurant.rating
-        }
     });
 }
 

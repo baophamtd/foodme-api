@@ -11,8 +11,8 @@ class restaurantModel {
         return restaurants.insert(restaurant);
     }
 
-    getRestaurant(query) {
-        return restaurants.find(query);
+    getRestaurant(id) {
+        return restaurants.find(id);
     }
 }
 
