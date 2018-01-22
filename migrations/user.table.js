@@ -1,11 +1,13 @@
 //Create the user table
 module.exports = {
     TableName: "Users",
-    KeySchema: [{
+    KeySchema: [
+    {
         AttributeName: "id",
         KeyType: "HASH"
-    }, ],
-    AttributeDefinitions: [{
+    }],
+    AttributeDefinitions: [
+    {
         AttributeName: "id",
         AttributeType: "S"
     }],

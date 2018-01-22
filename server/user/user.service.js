@@ -9,12 +9,11 @@ class userService {
     }
 
     createUser(user) {
-        console.log("GET CALLED:", user);
-        userModel.createUser(user);
+        return userModel.createUser(user);
     }
 
-    getUser(restaurant) {
-        return userModel.getUser(user);
+    getUser(facebookId) {
+        return userModel.getUser(facebookId);
     }
 
     deleteUser(restaurant) {

@@ -11,6 +11,9 @@ class User {
         //ex mm/dd/yyyy or mm/dd
         birthday,
 
+        //fb user_id
+        facebookId,
+
         //access token
         facebookToken,
 
@@ -28,6 +31,7 @@ class User {
         this.city = city || null;
         this.age = age || -1;
         this.birthday = birthday || null;
+        this.facebookId = facebookId || null;
         this.facebookToken = facebookToken || null;
         this.foodmeTokens = foodmeTokens || [];
         this.restaurantList = restaurantList || []

@@ -22,7 +22,7 @@
   "homepage": "https://github.com/baophamtd/foodme-api#readme",
   "dependencies": {
     "@google/maps": "^0.4.5",
-    "aws-sdk": "^2.181.0",
+    "aws-sdk": "^2.182.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
@@ -31,8 +31,8 @@
     "fetch": "^1.1.0",
     "jsonwebtoken": "^8.1.0",
     "node-fetch": "^1.7.3",
+    "uuid": "^3.1.0",
     "winston": "^2.4.0",
-    "shortid": "^2.2.8",
     "yelp-fusion": "^2.0.3"
   },
   "devDependencies": {

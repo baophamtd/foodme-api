@@ -17,9 +17,11 @@ class facebookService {
       .then(result => result.json())
       .then(json => {
         if(json.data && json.data.is_valid) {
-          return true;
+          //return user_id if valid
+          return json.data.user_id;
         }
         logger.log(json);
+        //or else return false
         return false;
       });
   }
