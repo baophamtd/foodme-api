@@ -6,20 +6,11 @@ const User = require('./user.object');
 
 class userController {
 
-  //Linkedin
-
-  //Facebook
-  /*
-    Two different verification phases
-    identical user creation
-  */
-
-  createUser(req, res) {
+    createUser(req, res) {
 
       //Takes a facebook token as input
       let facebookToken = req.body.facebookToken;
       let user = new User(req.body);
-
 
       //User needs to know that they are verified.
       //Client shouldnt wait for the user to be created
@@ -31,10 +22,11 @@ class userController {
                 console.log(user);
                 res.send("User Verified");
               } else {
+                //Generate unique user id
                 let id = uuidv4();
                 user.id = id;
-                user.id = facebookId;
-                let token = jwt.sign({user}, config.INTERNAL.SECRET_KEY,{ expiresIn: '1h' });
+                user.facebookId = facebookId;
+                let token = jwt.sign({userId:user.id, firstName:user.firstName, userId:user.lastName}, config.INTERNAL.SECRET_KEY,{ expiresIn: '720h' });
                 user.foodmeTokens.push(jwt.sign({user}, config.INTERNAL.SECRET_KEY));
                 userService.createUser(user)
                   .then(result => {
@@ -52,45 +44,42 @@ class userController {
         .catch(err => {
           res.send("Failed to verify user").status(403);
         });
-/*
-      //Retrieves data from facebookToken
-      facebookService.verifyAccessToken(facebookToken)
-        .then(facebookId => {
-            if(facebookId) {
 
-              if(userService.getUser(facebookId))
-              console.log(facebookId);
-              console.log(userService.getUser(facebookId));
-              //Creates user
-              user.facebookId = facebookId;
-              let id = uuidv4();
-              user.id = id;
-              let token = jwt.sign({user}, config.INTERNAL.SECRET_KEY,{ expiresIn: '1h' });
-              user.foodmeTokens.push(jwt.sign({user}, config.INTERNAL.SECRET_KEY));
-              userService.createUser(user)
-                .then(result => {
-                  res.send("User successfully created").status(200);
-                })
-                .catch(err => {
-                  res.send("Failed to create user").status(400);
-                })
-          }else{
-            res.send("Failed to verify user").status(401);
-          }
+      }
+
+      visitRestaurant(req, res){
+        let {token, restaurantId} = req.query;
+        var decoded = jwt.verify(token, config.INTERNAL.SECRET_KEY);
+        userService.getUser(decoded.userId)
+        .then(user => {
+            let restaurant = user.restaurantList.filter(restaurant => {
+              if(restaurants.id === restaurantId) {
+                return true;
+              }
+              return false;
+            });
+
+            if(restaurant) {
+              restaurant++;
+            } else {
+              user.restaurantList.push(new Restaurant({
+                id: restaurantId,
+                visits: 1
+              }));
+            }
+
+            //serialize the user
+            return userService.updateUser(user);
+        })
+        .then(result => {
+
         })
         .catch(err => {
-          logger.error("Failed to create user", err);
-          res.send("Create user error. " +  err).status(500);
-        })
-*/
-      //Add user to db
+        });
 
-      //Return success/failure
-  }
 
-  getUserInfo(req, res) {
+      }
 
-  }
-}
+
 
 module.exports = new userController();
