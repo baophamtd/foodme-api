@@ -49,7 +49,7 @@ class restaurantService {
             .then(restaurants => googleReduceRestaurants(restaurants, maxHeight, maxWidth))
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
-            .then(results => results.jsonBody.businesses)
+            .then(results => results.businesses)
             .then(yelpReduceRestaurants)
 
         return Promise.all([googleRestaurants, yelpRestaurants])
@@ -104,7 +104,6 @@ function mergeSearchResults(results) {
 
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-        console.log(restaurant);
         return new Restaurant({
             id: crypto.randomBytes(40).toString('hex'),
             name: restaurant.name,
@@ -118,7 +117,7 @@ function yelpReduceRestaurants(restaurants) {
                 lat: restaurant.coordinates.latitude,
                 lng: restaurant.coordinates.longitude
             },
-            price: restaurant.price.length || 0,
+            price: restaurant.price ? restaurant.price.length : 0,
             rating: restaurant.rating, 
             categories: restaurant.categories
         })

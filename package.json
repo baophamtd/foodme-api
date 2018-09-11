@@ -22,8 +22,8 @@
   "homepage": "https://github.com/baophamtd/foodme-api#readme",
   "dependencies": {
     "@google/maps": "^0.4.5",
-    "aws-sdk": "^2.181.0",
-    "bluebird": "^3.5.1",
+    "aws-sdk": "2.181.0",
+    "bluebird": "3.5.1",
     "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
     "dynasty": "^0.3.8",

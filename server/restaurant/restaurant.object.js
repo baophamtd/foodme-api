@@ -24,6 +24,7 @@ class Restaurant {
   }) {
     this.id = id;
     this.name = name;
+    this.location = location;
     this.country = country || null;
     this.state = state || null;
     this.city = city || null;
@@ -32,7 +33,6 @@ class Restaurant {
     this.price = price || 0;
     this.rating = rating || 0;
     this.photos = photos || ["No Photos"];
-    this.location = location;
     this.types = types || [];
     this.categories = categories || [];
     this.favorited = favorited || 0;

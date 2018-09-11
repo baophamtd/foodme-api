@@ -44,7 +44,10 @@ class googleService {
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
 
         return fetch(url)
-            .then(res => res.json());
+            .then(res => res.json())
+            .catch(err => {
+                console.log("Failed to retrieve data", err);
+            })
     }
 }
 
