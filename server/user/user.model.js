@@ -7,11 +7,19 @@ class userModel {
      * @params user:User object
      */
     createUser(user) {
-      return users.insert(user)
+      users.insert(user)
+      .catch(function (error){
+        logger.error("Failed to create user", error);
+      });
     }
 
-    getUser(facebookId) {
-      return users.find(facebookId);
+    getUser(query) {
+        return dynamoConnector.get(query, function(err, data) {
+            if(err) {
+                reject(err);
+            }
+            resolve(data);
+        });
     }
 }
 

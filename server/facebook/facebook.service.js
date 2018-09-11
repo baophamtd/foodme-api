@@ -16,6 +16,7 @@ class facebookService {
     return fetch(url)
       .then(result => result.json())
       .then(json => {
+        console.log(json);
         if(json.data && json.data.is_valid) {
           //return user_id if valid
           return json.data.user_id;
