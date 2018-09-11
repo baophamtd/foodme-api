@@ -13,13 +13,7 @@ app.use(bodyParser.json());
 //Start the dynamodb server
 if(config.ENV === "local") {
     let localDynamo = require('local-dynamo');
-    //localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
-    localDynamo.launch({
-      port: config.DYNAMO.PORT,
-      sharedDb: true,
-      heap: '512m',
-      dir:'./dynamodb',
-    });
+    localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
     console.log("Started dynamodb...");
 }
 
