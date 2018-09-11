@@ -21,22 +21,25 @@
   },
   "homepage": "https://github.com/baophamtd/foodme-api#readme",
   "dependencies": {
-    "@google/maps": "^0.4.5",
-    "aws-sdk": "^2.182.0",
-    "bluebird": "^3.5.1",
-    "body-parser": "^1.18.2",
+    "@google/maps": "^0.4.6",
+    "aws-sdk": "^2.304.0",
+    "bluebird": "^3.5.2",
+    "body-parser": "^1.18.3",
     "crypto": "^1.0.1",
-    "dynasty": "^0.3.8",
-    "express": "^4.16.2",
+    "dynasty": "^0.3.9",
+    "express": "^4.16.3",
     "fetch": "^1.1.0",
-    "jsonwebtoken": "^8.1.0",
+    "find-java-home": "^0.2.0",
+    "jsonwebtoken": "^8.3.0",
+    "mime": "^2.3.1",
     "node-fetch": "^1.7.3",
-    "uuid": "^3.1.0",
-    "winston": "^2.4.0",
+    "serverless-dynamodb-local": "^0.2.33",
+    "uuid": "^3.3.2",
+    "winston": "^2.4.4",
     "yelp-fusion": "^2.0.3"
   },
   "devDependencies": {
     "local-dynamo": "^0.5.0",
-    "nodemon": "^1.14.11"
+    "nodemon": "^1.18.4"
   }
 }

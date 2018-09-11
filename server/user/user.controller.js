@@ -7,7 +7,6 @@ const User = require('./user.object');
 class userController {
 
     createUser(req, res) {
-
       //Takes a facebook token as input
       let facebookToken = req.body.facebookToken;
       let user = new User(req.body);
@@ -38,7 +37,7 @@ class userController {
                 }
               })
               .catch(err => {
-                res.send("failed to retrieve user").status(200);
+                res.send("Failed to retrieve user").status(200);
               });
         })
         .catch(err => {
@@ -79,7 +78,6 @@ class userController {
 
 
       }
-
-
+}
 
 module.exports = new userController();

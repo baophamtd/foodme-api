@@ -1,4 +1,3 @@
-
 //Import the AWS connection information
 let AWS = require('./aws.connector');
 
@@ -6,4 +5,3 @@ let AWS = require('./aws.connector');
 let dynamodb = new AWS.DynamoDB();
 
 module.exports = dynamodb;
-
