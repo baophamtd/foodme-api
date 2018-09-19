@@ -1,5 +1,6 @@
 class Restaurant {
   constructor({
+    place_id,
     id,
     name,
     country,
@@ -22,6 +23,7 @@ class Restaurant {
     views,
     visits
   }) {
+    this.place_id = place_id || null;
     this.id = id;
     this.name = name;
     this.location = location;

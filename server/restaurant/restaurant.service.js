@@ -8,7 +8,7 @@ class restaurantService {
 
     constructor() {
 
-    }    
+    }
 
     createRestaurant(restaurant) {
         return restaurantModel.createRestaurant(restaurant);
@@ -72,10 +72,13 @@ function mergeSearchResults(results) {
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
             return new Restaurant({
+                place_id: restaurant.place_id,
                 id: restaurant.id,
                 name: restaurant.name,
-                photos: restaurant.photos.concat(redundantRestaurant.photos),
-                icon: restaurant.icon,                
+                //photos: restaurant.photos.concat(redundantRestaurant.photos),
+                photos: null,
+
+                icon: restaurant.icon,
                 city: restaurant.city,
                 country: restaurant.country,
                 state: restaurant.state,
@@ -94,7 +97,7 @@ function mergeSearchResults(results) {
     });
 
     for (var key in dictYelp) {
-        if (dictYelp.hasOwnProperty(key)) {     
+        if (dictYelp.hasOwnProperty(key)) {
             mergedResults.push(dictYelp[key]);
         }
     }
@@ -105,6 +108,7 @@ function mergeSearchResults(results) {
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
         return new Restaurant({
+            place_id: restaurant.id,
             id: crypto.randomBytes(40).toString('hex'),
             name: restaurant.name,
             photos: [restaurant.image_url || "No Photo"],
@@ -118,7 +122,7 @@ function yelpReduceRestaurants(restaurants) {
                 lng: restaurant.coordinates.longitude
             },
             price: restaurant.price ? restaurant.price.length : 0,
-            rating: restaurant.rating, 
+            rating: restaurant.rating,
             categories: restaurant.categories
         })
     });
@@ -126,17 +130,17 @@ function yelpReduceRestaurants(restaurants) {
 
 function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
     return restaurants.map(restaurant => {
-        let photos = googleService.generatePhotoUrls({photos: restaurant.photos, maxHeight, maxWidth});
         return new Restaurant({
+            place_id: restaurant.place_id,
             id: restaurant.id,
-            location: {                
+            location: {
                 lat: restaurant.geometry.location.lat,
                 lng: restaurant.geometry.location.lng,
             },
             price: restaurant.price_level || 0,
             icon: restaurant.icon,
             address: restaurant.vicinity,
-            photos: photos,
+            photos: restaurant.photos,
             name: restaurant.name,
             rating: restaurant.rating,
             types: restaurant.types
@@ -145,7 +149,7 @@ function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
 }
 
 function keyRestaurant(lat, lng) {
-    return `${Number(lat).toFixed(3)}${Number(lng).toFixed(3)}`; 
+    return `${Number(lat).toFixed(3)}${Number(lng).toFixed(3)}`;
 }
 
 

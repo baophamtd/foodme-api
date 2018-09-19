@@ -11,19 +11,18 @@ Unordered list:
   * Express.js
   * Bodyparses
 ## Getting Started :
-### Running Migrations 
+### Running Migrations
 To run the dynamodb locally you need to use the link provided above and download the relavent version.  Then you need to run :
 ```shell
 npm run migrate
 ```
-
+### Dynamodb folder after being downloaded and unzipped from AWS needs to be put inside Server folder
 
 ### All dependencies have been included in the package.json after cloning the repo. Just need to
-```sh 
+```sh
 npm install
 ```
 
 After installing everything, sample data needs to be inserted into DynamoDB starting on port 8000
 
 Run the app...
-

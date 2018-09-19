@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 //Start the dynamodb server
 if(config.ENV === "local") {
     let localDynamo = require('local-dynamo');
-    localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
-    console.log("Started dynamodb...");
+    //localDynamo.launch('./dynamodb', config.DYNAMO.PORT);
+    //console.log("Started dynamodb...");
 }
 
 //add router
