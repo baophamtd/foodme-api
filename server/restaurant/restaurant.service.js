@@ -46,11 +46,14 @@ class restaurantService {
     searchForRestaurants({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth}) {
         let googleRestaurants = googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
             .then(json => json.results)
+            .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
             .then(restaurants => googleReduceRestaurants(restaurants, maxHeight, maxWidth))
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
             .then(results => results.businesses)
-            .then(yelpReduceRestaurants)
+            .then(restaurants => googleService.getAvailablePlaceId({restaurants, lat, lng, radius}))
+            .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
+            .then(restaurants => yelpReduceRestaurants(restaurants))
 
         return Promise.all([googleRestaurants, yelpRestaurants])
             .then(mergeSearchResults)
@@ -75,8 +78,8 @@ function mergeSearchResults(results) {
                 place_id: restaurant.place_id,
                 id: restaurant.id,
                 name: restaurant.name,
-                //photos: restaurant.photos.concat(redundantRestaurant.photos),
-                photos: null,
+                photos: restaurant.photos.concat(redundantRestaurant.photos),
+                //photos: null,
 
                 icon: restaurant.icon,
                 city: restaurant.city,
@@ -108,8 +111,10 @@ function mergeSearchResults(results) {
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
         return new Restaurant({
-            place_id: restaurant.id,
-            id: crypto.randomBytes(40).toString('hex'),
+            place_id: restaurant.place_id,
+            //Old code Shinjo added random 40 bytes id
+            //id: crypto.randomBytes(40).toString('hex'),
+            id: restaurant.id,
             name: restaurant.name,
             photos: [restaurant.image_url || "No Photo"],
             city: restaurant.location.city,

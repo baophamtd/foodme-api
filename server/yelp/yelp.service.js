@@ -11,7 +11,6 @@ class yelpService {
         this.request = this.request.bind(this);
     }
 
-
     request({url, method, body}) {
         let options = {
             method,
@@ -25,9 +24,9 @@ class yelpService {
         }
 
         return fetch(url, options)
-    
+
     }
-    
+
     searchForRestaurants({lng, lat, radius, minPrice}){
         let query = {
             latitude: lat,

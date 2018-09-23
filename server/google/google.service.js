@@ -4,56 +4,79 @@ const querystring = require('querystring');
 const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
 const apiToken = config.GOOGLE.MAPS.API_TOKEN;
-var Promise = require("bluebird");
 
 class googleService {
     constructor() {
 
     }
 
-    generatePhotoUrls(place_id, maxWidth, maxHeight) {
-      /*
-        if(place_id)
-            return photos.map(photo => {
-                //let id = photo.photo_reference;
-                console.log(place_id);
-                let query = {
-                    place_id:place_id,
-                    key: apiToken,
-                    maxwidth: maxWidth || 1000,
-                    maxheight: maxHeight || 1000,
-                    fields: 'photo'
-                };
-                console.log(`${apiEndPoint}/details/json?${querystring.stringify(query)}`);
-                return `${apiEndPoint}/details/json?${querystring.stringify(query)}` || "No Photo";
-            });
-        else
-            return ["No Photo"];*/
+    //seach the place found in Yelp on Google API
+    //because Yelp Query Rate per Second is only 5
+    getAvailablePlaceId({restaurants, lat, lng, radius}){
+      let query = {
+          key: apiToken,
+          fields: 'place_id',
+          inputtype: 'textquery'
+      };
+      //console.log(restaurants.length);
+      var promises = restaurants.map((restaurant) => {
+          query.input = restaurant.name;
+          let searchUrl = `${apiEndPoint}/findplacefromtext/json?${querystring.stringify(query)}&locationbias=cirle:${radius}@${lat},${lng}`;
+          //console.log(searchUrl);
+          return fetch(searchUrl)
+          .then(searchResults => searchResults.json())
+          .then((response) => {
+            if(response.status !== 'ZERO_RESULTS'){
+              restaurant.place_id = response.candidates[0].place_id;
+            }
+            //console.log(restaurant)
+            return restaurant;
+          })
+      });
 
-            //console.log(`${apiEndPoint}/details/json?${querystring.stringify(query)}`);
-            //return `${apiEndPoint}/details/json?${querystring.stringify(query)}` || "No Photo";
-            let query = {
-                place_id:place_id,
-                key: apiToken,
-                maxwidth: maxWidth || 1000,
-                maxheight: maxHeight || 1000,
-                fields: 'photo'
-            };
+      return Promise.all(promises).then(results => {
+        return results;
+      });
 
-            let url = `${apiEndPoint}/details/json?${querystring.stringify(query)}`;
-            console.log('url is:'+url);
-            return fetch(url)
-                .then(res => res.json())
-                .then((responseJSON) =>{
-                  console.log('response is:'+responseJSON)
-                  //return responseJSON;
-                })
-                .catch(err => {
-                    console.log("Failed to retrieve data", err);
-                })
     }
 
-    async getPlaces({lng, lat, radius, minPrice, maxPrice}) {
+    getPhotoUrls({restaurants, maxWidth, maxHeight}) {
+
+
+        let query = {
+            key: apiToken,
+            maxwidth: maxWidth || 1000,
+            maxheight: maxHeight || 1000,
+            fields: 'photo'
+        };
+
+        var promises = restaurants.filter(function(restaurant) {
+                if (restaurant.place_id == null) {
+                  return false; // skip
+                }
+                return true;
+            })
+            .map((restaurant) => {
+            query.place_id = restaurant.place_id;
+            let photoUrl = `${apiEndPoint}/details/json?${querystring.stringify(query)}`;
+            return fetch(photoUrl)
+            .then(photoResults => photoResults.json())
+            .then((response) => {
+              if(restaurant.image_url != null){
+                restaurant.image_url = response.result.photos;
+              }else{
+                restaurant.photos = response.result.photos;
+              }
+              return restaurant;
+            })
+        });
+
+        return Promise.all(promises).then(results => {
+          return results;
+        });
+    }
+
+    getPlaces({lng, lat, radius, minPrice, maxPrice}) {
         let type = "restaurant";
 
         let query = {
@@ -67,46 +90,8 @@ class googleService {
         };
 
         let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
-        fetch(url)
+        return fetch(url)
             .then(res => res.json())
-            .then((responseJSON) =>{
-                let photoQuery = {
-                    key: apiToken,
-                    maxwidth: 1000,
-                    maxheight: 1000,
-                    fields: 'photo'
-                };
-                var promises = responseJSON.results.map((restaurant) => {
-                  photoQuery.place_id = restaurant.place_id;
-                  let photoUrl = `${apiEndPoint}/details/json?${querystring.stringify(photoQuery)}`;
-                  fetch(photoUrl)
-                  .then(photoResults => photoResults.json())
-                  .then((response) => {
-                    restaurant.photos = response.result.photos;
-                    console.log(response)
-                  })
-
-                });
-                Promise.all(promises).then(results => {
-                  return results;
-                });
-                /*
-                Promise.all(responseJSON.results.map(async (restaurant) =>
-                { // Notice callback is async
-                    photoQuery.place_id = restaurant.place_id;
-                    let photoUrl = `${apiEndPoint}/details/json?${querystring.stringify(photoQuery)}`;
-                    //console.log(photoUrl);
-                    await fetch(photoUrl).then(photos => photos.json()).then((photoResults)=>
-                    {
-                      //console.log(restaurant.photos.length + '------'+ photoResults.result.photos.length);
-                      //restaurant.photos = photoResults.result.photos;
-                      //console.log(restaurant.photos.length);
-                      console.log("HERE "+photoResults);
-                    })
-                    //return card
-                }))
-                */
-            })
             .catch(err => {
                 console.log("Failed to retrieve data", err);
             })
