@@ -1,0 +1,20 @@
+const MongoClient = require('mongodb').MongoClient;
+const uri = 'mongodb://localhost:27017'
+let db;
+
+const connectDB = async (callback) => {
+     try {
+         MongoClient.connect(uri, { useNewUrlParser: true }, (err, client) => {
+             db = client.db('foodme')
+             return callback(err)
+         })
+     } catch (e) {
+         throw e
+     }
+ }
+
+ const getDB = () => db
+
+ const disconnectDB = () => db.close()
+
+ module.exports = { connectDB, getDB, disconnectDB }

@@ -8,6 +8,7 @@ const restaurantController = new require('./restaurant.controller');
 const controller = new restaurantController();
 
 router.get('/search', controller.getRestaurants);
+router.get('/lookup', controller.lookupRestaurant);
 router.get('/:id', controller.getRestaurant);
 
 router.post('/like/:id', controller.likeRestaurant);

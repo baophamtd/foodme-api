@@ -10,12 +10,15 @@ class restaurantService {
 
     }
 
-    createRestaurant(restaurant) {
-        return restaurantModel.createRestaurant(restaurant);
+    createRestaurants(restaurants) {
+        return restaurantModel.createRestaurants(restaurants);
     }
 
-    getRestaurant(id) {
-        return restaurantModel.getRestaurant(id);
+    getRestaurantByID(place_id, id) {
+        return restaurantModel.getRestaurantByID(place_id, id)
+          .then(result => {
+            return result;
+          })
     }
 
     deleteRestaurant(restaurant) {
@@ -46,18 +49,47 @@ class restaurantService {
     searchForRestaurants({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth}) {
         let googleRestaurants = googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
             .then(json => json.results)
+            .then(restaurants => {
+              //console.log(restaurants);
+              return filterRestaurantsWithDB(restaurants);
+            })
             .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
-            .then(restaurants => googleReduceRestaurants(restaurants, maxHeight, maxWidth))
+            //.then(restaurants => googleReduceRestaurants(restaurants, maxHeight, maxWidth))
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
             .then(results => results.businesses)
-            .then(restaurants => googleService.getAvailablePlaceId({restaurants, lat, lng, radius}))
+            .then(restaurants => {
+              //console.log(restaurants);
+              return filterRestaurantsWithDB(restaurants);
+            })
+            .then(restaurants => googleService.getAvailablePlaceID({restaurants, lat, lng, radius}))
             .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
-            .then(restaurants => yelpReduceRestaurants(restaurants))
+            //.then(restaurants => yelpReduceRestaurants(restaurants))
 
         return Promise.all([googleRestaurants, yelpRestaurants])
             .then(mergeSearchResults)
     }
+}
+
+//filter restaurants result with DB to avoid redundant requests
+function filterRestaurantsWithDB(restaurants){
+  var promises = restaurants.map((restaurant) => {
+      return restaurantModel.getRestaurantByID(restaurant.place_id, restaurant.id)
+      .then(_restaurant =>{
+        if(_restaurant){
+          _restaurant.in_db = true;
+          return _restaurant
+        }else{
+          restaurant.in_db = false;
+          return restaurant
+        }
+      })
+
+  });
+
+  return Promise.all(promises).then(results => {
+    return results;
+  });
 }
 
 function mergeSearchResults(results) {
@@ -77,10 +109,9 @@ function mergeSearchResults(results) {
             return new Restaurant({
                 place_id: restaurant.place_id,
                 id: restaurant.id,
+                in_db: restaurant.in_db,
                 name: restaurant.name,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
-                //photos: null,
-
                 icon: restaurant.icon,
                 city: restaurant.city,
                 country: restaurant.country,

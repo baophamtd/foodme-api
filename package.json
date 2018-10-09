@@ -8,7 +8,8 @@
     "start": "NODE_ENV=local nodemon server/server.js",
     "windows": "nodemon server/server.js",
     "migrate": "node migrations/run.js",
-    "test": ""
+    "mongodb-start": "brew services start mongodb",
+    "mongodb-stop": "brew services stop mongodb"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "express": "^4.16.2",
     "fetch": "^1.1.0",
     "jsonwebtoken": "^8.1.0",
+    "mongodb": "^3.1.6",
     "node-fetch": "^1.7.3",
     "shortid": "^2.2.8",
     "winston": "^2.4.0",
