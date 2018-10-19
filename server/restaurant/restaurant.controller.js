@@ -4340,7 +4340,8 @@ class restaurantController {
     }
 
     lookupRestaurant(req, res){
-      restaurantService.getRestaurantByID("ChIJ9RrLdDq7j4ARlnUomJYc3iw","cdfdf")
+      let {place_id, id} = req.query;
+      restaurantService.getRestaurantByID(place_id,id)
         .then(result=>{
           res.send(result)
         })

@@ -9,7 +9,7 @@ const userController = require('./user.controller');
 router.post('/createUser', userController.createUser);
 
 //Visit a restaurant
-router.post('/visitRestaurant', userController.visitRestaurant);
+//router.post('/visitRestaurant', userController.visitRestaurant);
 
 
 module.exports = router;

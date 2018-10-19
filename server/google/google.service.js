@@ -31,7 +31,6 @@ class googleService {
               if(response.status !== 'ZERO_RESULTS'){
                 restaurant.place_id = response.candidates[0].place_id;
               }
-              //console.log(restaurant)
               return restaurant;
             })
           }else{

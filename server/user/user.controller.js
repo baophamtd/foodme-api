@@ -1,11 +1,47 @@
 const jwt = require('jsonwebtoken');
-const uuidv4 = require('uuid/v4');
+const uniqid = require('uniqid');
 const facebookService = require('../facebook/facebook.service');
 const userService = require('./user.service');
 const User = require('./user.object');
 
 class userController {
 
+  constructor() {
+      this.createUser = this.createUser.bind(this);
+  }
+
+  createUser(req, res) {
+    let user = new User({
+      id: uniqid(),
+      firstName: null,
+      lastName:null,
+      gender:null,
+      country:null,
+      city:null,
+      age:null,
+      //ex mm/dd/yyyy or mm/dd
+      birthday:null,
+
+      //fb user_id
+      facebookId:null,
+
+      //access token
+      facebookToken:null,
+
+      //array json web token
+      foodmeTokens: [],
+
+      //list of restaurant id's
+      wentToRestaurantList:[],
+      likedRestaurantList:[],
+      dislikedRestaurantList:[],
+    });
+    return userService.createUser(user)
+    .then((result) =>{
+      (result == 1) ? res.send("User Created") : res.send("User Existed");
+    })
+  }
+    /*
     createUser(req, res) {
       //Takes a facebook token as input
       let facebookToken = req.body.facebookToken;
@@ -75,9 +111,8 @@ class userController {
         })
         .catch(err => {
         });
-
-
       }
+      */
 }
 
 module.exports = new userController();

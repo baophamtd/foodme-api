@@ -49,25 +49,34 @@ class restaurantService {
     searchForRestaurants({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth}) {
         let googleRestaurants = googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
             .then(json => json.results)
+            .then(restaurants => googleReduceRestaurants(restaurants))
             .then(restaurants => {
-              //console.log(restaurants);
               return filterRestaurantsWithDB(restaurants);
             })
-            .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
-            //.then(restaurants => googleReduceRestaurants(restaurants, maxHeight, maxWidth))
+            .then(restaurants => {
+              return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+
+            })
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
             .then(results => results.businesses)
             .then(restaurants => {
               //console.log(restaurants);
+              return yelpReduceRestaurants(restaurants)})
+            .then(restaurants => {
               return filterRestaurantsWithDB(restaurants);
             })
-            .then(restaurants => googleService.getAvailablePlaceID({restaurants, lat, lng, radius}))
-            .then(restaurants => googleService.getPhotoUrls({restaurants, maxHeight, maxWidth}))
-            //.then(restaurants => yelpReduceRestaurants(restaurants))
+            .then(restaurants => {
+              return googleService.getAvailablePlaceID({restaurants, lat, lng, radius});
+            })
+            .then(restaurants => {
+              return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+            })
 
         return Promise.all([googleRestaurants, yelpRestaurants])
-            .then(mergeSearchResults)
+            .then(results =>{
+              return mergeSearchResults(results)
+            })
     }
 }
 
@@ -78,10 +87,10 @@ function filterRestaurantsWithDB(restaurants){
       .then(_restaurant =>{
         if(_restaurant){
           _restaurant.in_db = true;
-          return _restaurant
+          return _restaurant;
         }else{
           restaurant.in_db = false;
-          return restaurant
+          return restaurant;
         }
       })
 
@@ -107,21 +116,20 @@ function mergeSearchResults(results) {
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
             return new Restaurant({
-                place_id: restaurant.place_id,
                 id: restaurant.id,
-                in_db: restaurant.in_db,
+                place_id: restaurant.place_id,
                 name: restaurant.name,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
-                icon: restaurant.icon,
+                location: restaurant.location,
+                /*
                 city: restaurant.city,
                 country: restaurant.country,
                 state: restaurant.state,
                 zip: restaurant.zip_code,
-                location: restaurant.location,
+                */
+                price: restaurant.price || redundantRestaurant.price,
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
                 types: restaurant.types,
-                price: restaurant.price || redundantRestaurant.price,
-                categories: redundantRestaurant.categories
             })
 
             delete dictYelp[key]
@@ -141,46 +149,50 @@ function mergeSearchResults(results) {
 
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-        return new Restaurant({
-            place_id: restaurant.place_id,
+        return {
             //Old code Shinjo added random 40 bytes id
             //id: crypto.randomBytes(40).toString('hex'),
             id: restaurant.id,
+            place_id: null,
             name: restaurant.name,
+            //open_now: !restaurant.is_closed || false,
             photos: [restaurant.image_url || "No Photo"],
-            city: restaurant.location.city,
-            country: restaurant.location.country,
-            state: restaurant.location.state,
-            address: restaurant.location.address1,
-            zip: restaurant.location.zip_code,
             location: {
                 lat: restaurant.coordinates.latitude,
                 lng: restaurant.coordinates.longitude
             },
+            address: restaurant.location.address1 + ", "+ restaurant.location.city,
+            /*
+            city: restaurant.location.city,
+            state: restaurant.location.state,
+            country: restaurant.location.country,
+            zip: restaurant.location.zip_code,
+            */
             price: restaurant.price ? restaurant.price.length : 0,
             rating: restaurant.rating,
-            categories: restaurant.categories
-        })
+            types: restaurant.categories
+        };
     });
 }
 
-function googleReduceRestaurants(restaurants, maxHeight, maxWidth) {
+function googleReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-        return new Restaurant({
-            place_id: restaurant.place_id,
+        return {
             id: restaurant.id,
+            place_id: restaurant.place_id,
+            name: restaurant.name,
+            //open_now: restaurant.opening_hours.open_now || false,
+            photos: restaurant.photos,
             location: {
                 lat: restaurant.geometry.location.lat,
                 lng: restaurant.geometry.location.lng,
             },
-            price: restaurant.price_level || 0,
-            icon: restaurant.icon,
             address: restaurant.vicinity,
-            photos: restaurant.photos,
-            name: restaurant.name,
+            price: restaurant.price_level || 0,
             rating: restaurant.rating,
-            types: restaurant.types
-        });
+            types: restaurant.types,
+            //icon: restaurant.icon,
+        };
     });
 }
 

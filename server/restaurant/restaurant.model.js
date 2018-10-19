@@ -27,17 +27,18 @@ class restaurantModel {
             place_id: restaurant.place_id,
             id: restaurant.id,
             name: restaurant.name,
+            photos: restaurant.photos,
             location: restaurant.location,
+            /*
             country: restaurant.country,
             state: restaurant.state,
             city: restaurant.city,
             zip: restaurant.zip,
+            */
             address: restaurant.address,
             price: restaurant.price,
             rating: restaurant.rating,
-            photos: restaurant.photos,
             types: restaurant.types,
-            categories: restaurant.categories,
             favorited: restaurant.favorited,
             likes: restaurant.likes,
             dislikes: restaurant.dislikes,
@@ -49,7 +50,6 @@ class restaurantModel {
       })
 
       return Promise.all(promises).then(results => {
-        console.log(results.length);
         return results.length;
       });
     }

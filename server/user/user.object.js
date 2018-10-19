@@ -21,7 +21,9 @@ class User {
         foodmeTokens,
 
         //list of restaurant id's
-        restaurantList
+        wentToRestaurantList,
+        likedRestaurantList,
+        dislikedRestaurantList,
     }) {
         this.id = id;
         this.firstName = firstName;
@@ -34,7 +36,9 @@ class User {
         this.facebookId = facebookId || null;
         this.facebookToken = facebookToken || null;
         this.foodmeTokens = foodmeTokens || [];
-        this.restaurantList = restaurantList || []
+        this.wentToRestaurantList = wentToRestaurantList || [];
+        this.likedRestaurantList = likedRestaurantList || [];
+        this.dislikedRestaurantList = dislikedRestaurantList || [];
     }
 }
 
