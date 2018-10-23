@@ -45,7 +45,7 @@ class userModel {
       }
       return MongoDB.getDB().collection('users').findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
       .then(result =>{
-        return (result.value == null) ? 1:0;
+        return (result.value == null) ? user.id:0;
       })
 
     }

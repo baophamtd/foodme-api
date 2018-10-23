@@ -38,9 +38,10 @@ class userController {
     });
     return userService.createUser(user)
     .then((result) =>{
-      (result == 1) ? res.send("User Created") : res.send("User Existed");
+      (result != 0) ? res.send({"id":result}) : res.send("User Existed");
     })
   }
+
     /*
     createUser(req, res) {
       //Takes a facebook token as input

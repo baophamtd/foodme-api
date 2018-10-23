@@ -1,10 +1,11 @@
 //Lib
 const fetch = require('node-fetch');
 const querystring = require('querystring');
+const Promise = require("bluebird");
+const busyHours = require('busy-hours');  //this library scraping google data
 const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
 const apiToken = config.GOOGLE.MAPS.API_TOKEN;
-const restaurantService = require('../restaurant/restaurant.service');
 
 class googleService {
     constructor() {
@@ -23,7 +24,7 @@ class googleService {
       var promises = restaurants.map((restaurant) => {
           if(!restaurant.in_db){
             query.input = restaurant.name;
-            let searchUrl = `${apiEndPoint}/findplacefromtext/json?${querystring.stringify(query)}&locationbias=cirle:${radius}@${lat},${lng}`;
+            let searchUrl = `${apiEndPoint}/place/findplacefromtext/json?${querystring.stringify(query)}&locationbias=cirle:${radius}@${lat},${lng}`;
 
             return fetch(searchUrl)
             .then(searchResults => searchResults.json())
@@ -63,7 +64,7 @@ class googleService {
             .map((restaurant) => {
                 if(!restaurant.in_db){
                   query.place_id = restaurant.place_id;
-                  let photoUrl = `${apiEndPoint}/details/json?${querystring.stringify(query)}`;
+                  let photoUrl = `${apiEndPoint}/place/details/json?${querystring.stringify(query)}`;
                   return fetch(photoUrl)
                   .then(photoResults => photoResults.json())
                   .then((response) => {
@@ -98,12 +99,61 @@ class googleService {
             maxPrice
         };
 
-        let url = `${apiEndPoint}/nearbysearch/json?${querystring.stringify(query)}`;
+        let url = `${apiEndPoint}/place/nearbysearch/json?${querystring.stringify(query)}`;
         return fetch(url)
             .then(res => res.json())
             .catch(err => {
                 console.log("Failed to retrieve data", err);
             })
+    }
+
+    //first 3 chars of date must contain acronym for day and first 2 digits of time must be hour in 24h
+    getBusyHour({place_id, date, time}){
+      busyHours(place_id, apiToken).then(data => {
+        /*
+          let busyHour = data.week
+          .filter(element =>{
+              return element.day === date.substring(0,3);
+          })[0].hours
+          .filter(element =>{
+            return element.hour == time;
+          })[0]
+
+          console.log(busyHour);
+          return busyHour;
+          */
+          return Promise.map(data.week, day => {
+              if (day === date.substring(0,3)) return day;
+          })
+          .filter(day => day !== undefined)
+
+       });
+    }
+
+    getSingleDistance({lat, lng, place_id}){
+      let query = {
+        key: apiToken,
+        units: 'imperial',
+        origins: `${lat},${lng}`,
+        destinations: `place_id:${place_id}`,
+        departure_time: 'now',
+        traffic_model: 'best_guess',
+      }
+
+      let url = `${apiEndPoint}/distancematrix/json?${querystring.stringify(query).replace('%2C',',').replace('%3A',':')}`;
+      return fetch(url)
+        .then(res =>res.json())
+        .then(responseJSON =>{
+          let distance = responseJSON.rows[0].elements[0].distance;
+          let duration = responseJSON.rows[0].elements[0].duration;
+          let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
+          let result = {
+            distance,
+            duration,
+            durationInTraffic
+          }
+          return result;
+        })
     }
 }
 

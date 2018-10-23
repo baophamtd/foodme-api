@@ -27,6 +27,7 @@
     "aws-sdk": "2.181.0",
     "bluebird": "3.5.1",
     "body-parser": "^1.18.2",
+    "busy-hours": "0.0.5",
     "crypto": "^1.0.1",
     "dynasty": "^0.3.14",
     "express": "^4.16.2",
