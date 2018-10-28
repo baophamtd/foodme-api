@@ -15,11 +15,10 @@ class connectionService {
     takeAction({lat, lng, userID, restaurantID, action, date, time}) {
         let temperature = this.getTemperature(lat, lng);
         let distance = googleService.getSingleDistance({lat, lng, place_id:restaurantID});
-        let busyHour = googleService.getBusyHour({place_id: restaurantID, date: 'Mon', time: '13'});
+        let busyHour = googleService.getBusyHour({place_id: restaurantID, date, time});
 
         return Promise.all([temperature, distance, busyHour])
             .then(results =>{
-              //console.log(results[2]);
               let connection  = new Connection({
                 userID: userID,
                 restaurantID: restaurantID,

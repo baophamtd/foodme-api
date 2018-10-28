@@ -9,10 +9,8 @@ class connectionController {
 
     takeAction(req, res) {
         let {lat, lng, userID, restaurantID, action, date, time} = req.body;
-        console.log(req.body);
         return connectionService.takeAction({lat, lng, userID, restaurantID, action, date, time})
             .then(result => {
-              console.log(result);
               (result != 0) ? res.send("success") : res.send("failure");
             })
             .catch(err => {

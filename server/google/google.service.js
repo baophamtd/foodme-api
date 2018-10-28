@@ -109,7 +109,7 @@ class googleService {
 
     //first 3 chars of date must contain acronym for day and first 2 digits of time must be hour in 24h
     getBusyHour({place_id, date, time}){
-      busyHours(place_id, apiToken).then(data => {
+      return busyHours(place_id, apiToken).then(data => {
         /*
           let busyHour = data.week
           .filter(element =>{
@@ -122,10 +122,7 @@ class googleService {
           console.log(busyHour);
           return busyHour;
           */
-          return Promise.map(data.week, day => {
-              if (day === date.substring(0,3)) return day;
-          })
-          .filter(day => day !== undefined)
+          return data.week;
 
        });
     }
