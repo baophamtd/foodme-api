@@ -1,9 +1,10 @@
 const crypto = require('crypto');
-
+const Promise = require("bluebird");
 const restaurantModel = require('./restaurant.model');
 const googleService = require('../google/google.service');
 const yelpService = require('../yelp/yelp.service');
 const Restaurant = require('./restaurant.object');
+
 class restaurantService {
 
     constructor() {
@@ -55,7 +56,9 @@ class restaurantService {
             })
             .then(restaurants => {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
-
+            })
+            .then(restaurants =>{
+              return googleService.getBusyHours(restaurants);
             })
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
@@ -69,8 +72,14 @@ class restaurantService {
             .then(restaurants => {
               return googleService.getAvailablePlaceID({restaurants, lat, lng, radius});
             })
+            .then(restaurants =>{
+              return insertAndRemoveRedundantRestaurants(restaurants);
+            })
             .then(restaurants => {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+            })
+            .then(restaurants =>{
+              return googleService.getBusyHours(restaurants);
             })
 
         return Promise.all([googleRestaurants, yelpRestaurants])
@@ -78,6 +87,26 @@ class restaurantService {
               return mergeSearchResults(results)
             })
     }
+}
+
+//insert the restaurants without place_id to avoid redundant requests
+//these restaurants are pulled from Yelp
+function insertAndRemoveRedundantRestaurants(restaurants){
+  //console.log(restaurants);
+  var promises = restaurants
+    .filter(function(restaurant) {
+        if (restaurant.place_id == null) {
+          return false; // skip
+        }
+        return true;
+    })
+    .map((restaurant) => {
+        return restaurant;
+      })
+
+  return Promise.all(promises).then(results => {
+    return results;
+  });
 }
 
 //filter restaurants result with DB to avoid redundant requests
@@ -101,6 +130,7 @@ function filterRestaurantsWithDB(restaurants){
   });
 }
 
+//merge results from both APIs
 function mergeSearchResults(results) {
     let dictYelp = [];
 
@@ -147,6 +177,7 @@ function mergeSearchResults(results) {
     return mergedResults;
 }
 
+//remove unneccessary fields
 function yelpReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
         return {
@@ -175,6 +206,7 @@ function yelpReduceRestaurants(restaurants) {
     });
 }
 
+//remove unneccessary fields
 function googleReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
         return {
@@ -196,6 +228,7 @@ function googleReduceRestaurants(restaurants) {
     });
 }
 
+//helper method to merge results
 function keyRestaurant(lat, lng) {
     return `${Number(lat).toFixed(3)}${Number(lng).toFixed(3)}`;
 }

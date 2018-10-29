@@ -24,8 +24,8 @@ class restaurantModel {
         }
         var set = {
           $set: {
-            place_id: restaurant.place_id,
-            id: restaurant.id,
+            place_id: restaurant.place_id,  //if place has no place_id, the id field below is from Yelp
+            id: restaurant.id,              //if place_id above is NOT null, this field is from Google
             name: restaurant.name,
             photos: restaurant.photos,
             location: restaurant.location,
@@ -38,6 +38,7 @@ class restaurantModel {
             address: restaurant.address,
             price: restaurant.price,
             rating: restaurant.rating,
+            busy_hours: restaurant.busy_hours,
             types: restaurant.types,
             favorited: restaurant.favorited,
             likes: restaurant.likes,

@@ -55,12 +55,13 @@ class googleService {
         };
 
         var promises = restaurants
+            /*
             .filter(function(restaurant) {
                 if (restaurant.place_id == null) {
                   return false; // skip
                 }
                 return true;
-            })
+            })*/
             .map((restaurant) => {
                 if(!restaurant.in_db){
                   query.place_id = restaurant.place_id;
@@ -107,24 +108,21 @@ class googleService {
             })
     }
 
-    //first 3 chars of date must contain acronym for day and first 2 digits of time must be hour in 24h
-    getBusyHour({place_id, date, time}){
-      return busyHours(place_id, apiToken).then(data => {
-        /*
-          let busyHour = data.week
-          .filter(element =>{
-              return element.day === date.substring(0,3);
-          })[0].hours
-          .filter(element =>{
-            return element.hour == time;
-          })[0]
+    //this might be illegal
+    getBusyHours(restaurants){
+      var promises = restaurants.map((restaurant) => {
+        return busyHours(restaurant.place_id, apiToken).then(data => {
+            if(data.week !== null){
+              restaurant.busy_hours = data.week;
+            }
+            return restaurant;
+         });
+      })
 
-          console.log(busyHour);
-          return busyHour;
-          */
-          return data.week;
+      return Promise.all(promises).then(results => {
+        return results;
+      });
 
-       });
     }
 
     getSingleDistance({lat, lng, place_id}){

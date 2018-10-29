@@ -11,6 +11,7 @@ class Restaurant {
     photos,
     price,
     rating,
+    busy_hours,
     //lat, lng
     location,
     types,
@@ -34,6 +35,7 @@ class Restaurant {
     this.address = address || null;
     this.price = price || 0;
     this.rating = rating || 0;
+    this.busy_hours = null;
     this.photos = photos || ["No Photos"];
     this.types = types || [];
     this.categories = categories || [];
