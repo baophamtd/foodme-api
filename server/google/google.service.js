@@ -111,12 +111,17 @@ class googleService {
     //this might be illegal
     getBusyHours(restaurants){
       var promises = restaurants.map((restaurant) => {
-        return busyHours(restaurant.place_id, apiToken).then(data => {
-            if(data.week !== null){
-              restaurant.busy_hours = data.week;
-            }
-            return restaurant;
-         });
+        if(!restaurant.in_db){
+          return busyHours(restaurant.place_id, apiToken)
+          .then(data => {
+              if(data.week !== null){
+                restaurant.busy_hours = data.week;
+              }
+              return restaurant;
+           })
+         }else{
+           return restaurant;
+         }
       })
 
       return Promise.all(promises).then(results => {
@@ -125,30 +130,38 @@ class googleService {
 
     }
 
-    getSingleDistance({lat, lng, place_id}){
+    getDistances({lat, lng, restaurants}){
       let query = {
         key: apiToken,
         units: 'imperial',
         origins: `${lat},${lng}`,
-        destinations: `place_id:${place_id}`,
         departure_time: 'now',
         traffic_model: 'best_guess',
       }
 
-      let url = `${apiEndPoint}/distancematrix/json?${querystring.stringify(query).replace('%2C',',').replace('%3A',':')}`;
-      return fetch(url)
-        .then(res =>res.json())
-        .then(responseJSON =>{
-          let distance = responseJSON.rows[0].elements[0].distance;
-          let duration = responseJSON.rows[0].elements[0].duration;
-          let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
-          let result = {
-            distance,
-            duration,
-            durationInTraffic
-          }
-          return result;
-        })
+      let promises = restaurants.map(restaurant => {
+        query.destinations = `place_id:${restaurant.place_id}`;
+        let url = `${apiEndPoint}/distancematrix/json?${querystring.stringify(query).replace('%2C',',').replace('%3A',':')}`;
+        return fetch(url)
+          .then(res =>res.json())
+          .then(responseJSON =>{
+            let distance = responseJSON.rows[0].elements[0].distance;
+            let duration = responseJSON.rows[0].elements[0].duration;
+            let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
+            let result = {
+              distance,
+              duration,
+              durationInTraffic
+            }
+            restaurant.distance = result;
+            return restaurant;
+          })
+      })
+
+      return Promise.all(promises).then(results => {
+        return results;
+      });
+
     }
 }
 

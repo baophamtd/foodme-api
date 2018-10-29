@@ -58,8 +58,12 @@ class restaurantService {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
             })
             .then(restaurants =>{
+              return googleService.getDistances({lat, lng, restaurants});
+            })
+            .then(restaurants =>{
               return googleService.getBusyHours(restaurants);
             })
+
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
             .then(results => results.businesses)
@@ -77,6 +81,9 @@ class restaurantService {
             })
             .then(restaurants => {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+            })
+            .then(restaurants =>{
+              return googleService.getDistances({lat, lng, restaurants});
             })
             .then(restaurants =>{
               return googleService.getBusyHours(restaurants);
@@ -145,22 +152,29 @@ function mergeSearchResults(results) {
         let key = keyRestaurant(restaurant.location.lat, restaurant.location.lng);
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
-            return new Restaurant({
+            return {
                 id: restaurant.id,
                 place_id: restaurant.place_id,
                 name: restaurant.name,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
                 location: restaurant.location,
+                address: restaurant.address,
+                busy_hours: restaurant.busy_hours,
                 /*
                 city: restaurant.city,
                 country: restaurant.country,
                 state: restaurant.state,
                 zip: restaurant.zip_code,
                 */
+                favorited: restaurant.favorited,
+                likes: restaurant.likes,
+                dislikes: restaurant.dislikes,
+                views: restaurant.views,
+                visits: restaurant.visits,
                 price: restaurant.price || redundantRestaurant.price,
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
                 types: restaurant.types,
-            })
+            }
 
             delete dictYelp[key]
         } else {
@@ -209,6 +223,9 @@ function yelpReduceRestaurants(restaurants) {
 //remove unneccessary fields
 function googleReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
+      if(restaurant.name == 'The Old Spaghetti Factory'){
+        console.log(restaurant.vicinity)
+      }
         return {
             id: restaurant.id,
             place_id: restaurant.place_id,
