@@ -5,7 +5,7 @@ const assert = require('assert');
 
 class connectionModel {
 
-    insertSingleConnection(connection) {
+    insertConnection(connection) {
 
       return MongoDB.getDB().collection('connections').insertOne(connection)
       .then(result =>{

@@ -174,6 +174,7 @@ function mergeSearchResults(results) {
                 price: restaurant.price || redundantRestaurant.price,
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
                 types: restaurant.types,
+                distance: restaurant.distance,
             }
 
             delete dictYelp[key]
