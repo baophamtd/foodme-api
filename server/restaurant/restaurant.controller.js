@@ -4307,10 +4307,17 @@ class restaurantController {
         let radius = calculateRadius(radiusMiles, radiusKilometers);
         //console.log(restaurants);
         restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
-           // .then(restaurants => filterRestaurants(restaurants, minPrice, maxPrice, minRating))
+            //filter out closed restaurants 
             .then(restaurants => {
-              res.send(restaurants);
-              return restaurantService.createRestaurants(restaurants);
+                let openRestaurants = restaurants.filter(restaurant => {
+                    if(restaurant.open_now) {
+                      return true;
+                    }
+                    return false;
+                  });
+
+                res.send(openRestaurants);
+                return restaurantService.createRestaurants(restaurants);
 
             })
             .then(done => logger.info(`Finished updating restaurants into the DB `, done))

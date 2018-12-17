@@ -54,7 +54,7 @@ class restaurantService {
             .then(restaurants => {
               return filterRestaurantsWithDB(restaurants);
             })
-            .then(restaurants => {
+            /*.then(restaurants => {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
             })
             .then(restaurants =>{
@@ -62,7 +62,7 @@ class restaurantService {
             })
             .then(restaurants =>{
               return googleService.getBusyHours(restaurants);
-            })
+            })*/
 
 
         let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
@@ -79,7 +79,7 @@ class restaurantService {
             .then(restaurants =>{
               return insertAndRemoveRedundantRestaurants(restaurants);
             })
-            .then(restaurants => {
+            /*.then(restaurants => {
               return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
             })
             .then(restaurants =>{
@@ -87,11 +87,20 @@ class restaurantService {
             })
             .then(restaurants =>{
               return googleService.getBusyHours(restaurants);
-            })
+            })*/
 
         return Promise.all([googleRestaurants, yelpRestaurants])
             .then(results =>{
-              return mergeSearchResults(results)
+                return mergeSearchResults(results)
+            })
+            .then(restaurants =>{
+                return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+            })
+            .then(restaurants =>{
+                return googleService.getDistances({lat, lng, restaurants});
+            })
+            .then(restaurants =>{
+                return googleService.getBusyHours(restaurants);
             })
     }
 }
@@ -161,6 +170,7 @@ function mergeSearchResults(results) {
                 id: restaurant.id,
                 place_id: restaurant.place_id,
                 name: restaurant.name,
+                open_now: restaurant.open_now,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
                 location: restaurant.location,
                 address: restaurant.address,
@@ -206,7 +216,7 @@ function yelpReduceRestaurants(restaurants) {
             id: restaurant.id,
             place_id: null,
             name: restaurant.name,
-            //open_now: !restaurant.is_closed || false,
+            open_now: !restaurant.is_closed || false,
             photos: [restaurant.image_url || "No Photo"],
             location: {
                 lat: restaurant.coordinates.latitude,
@@ -229,14 +239,11 @@ function yelpReduceRestaurants(restaurants) {
 //remove unneccessary fields
 function googleReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-      if(restaurant.name == 'The Old Spaghetti Factory'){
-        console.log(restaurant.vicinity)
-      }
         return {
             id: restaurant.id,
             place_id: restaurant.place_id,
             name: restaurant.name,
-            //open_now: restaurant.opening_hours.open_now || false,
+            open_now: restaurant.opening_hours.open_now || false,
             photos: restaurant.photos,
             location: {
                 lat: restaurant.geometry.location.lat,
