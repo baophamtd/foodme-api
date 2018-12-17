@@ -20,7 +20,7 @@ router.post('/invite', controller.inviteToGroup);
 router.get('/membership', controller.getCurrentMembership);
 
 // Update a groups data
-router.update('/update', controller.updateGroup);
+router.put('/update', controller.updateGroup);
 
 // begin a search
 router.post('/search', controller.beginGroupSearch);

@@ -1,13 +1,10 @@
 const Group = require('./group.object');
-const GroupService = require('/group.service');
-
-// Incase localization is needed
-const FAILED_TO_FIND_USER = "Failed to find user";
+const GroupService = require('./groups.service');
 
 /**
  * All group data absolutley needs to be persisted, similar to user data this data is absolutley critical for the app to function in a future state
  *
- * TODO:
+ * TODO: Implement all the methods!!
  *
  *
  */
@@ -18,7 +15,7 @@ class groupController {
 
 
     /**
-     * Retrieve information about a specific group
+     * Retrieve information about a list of groups
      * @method POST
      * @param {int} id
      * @returns {Group} the group with the corresponding id, or a 404
@@ -26,13 +23,14 @@ class groupController {
     getGroups(req, res) {
         const userId = req.params.id;
         GroupService.get([userId])
-            .then(user => stripUser)
-            .then(strippedUser => {
-                res.json(strippedUser);
+            .then(groups => stripGroups)
+            .then(strippedGroups => {
+                res.json(strippedGroups);
+                logger.log(`returned information for ${strippedGroups.length} groups`);
             })
             .catch(err => {
                 res.status(404);
-                res.send(FAILED_TO_FIND_USER);
+                res.send("Failed to find the specified group.");
             })
         return "getGroups";
     }
@@ -88,10 +86,13 @@ class groupController {
 
 }
 
-function stripUser(User) {
- return {
-     'userId': user.id
- }
+function stripGroup(groups) {
+    return groups.map(group => {
+        return {
+            'userId': user.id,
+            'username': user.first
+        }
+    });
 }
 
 module.exports = groupController;
