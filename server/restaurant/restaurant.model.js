@@ -7,7 +7,9 @@ const assert = require('assert');
 
 class restaurantModel {
     constructor() {
-      //const db = MongoDB.getDB();
+      this.db = MongoDB.getDB();
+      this.createRestaurants = this.createRestaurants.bind(this);
+      this.getRestaurantByID = this.getRestaurantByID.bind(this);
     }
 
     updateRestaurant(id, update) {

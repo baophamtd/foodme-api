@@ -98,22 +98,27 @@ class restaurantService {
 
 //insert the restaurants without place_id to avoid redundant requests
 //these restaurants are pulled from Yelp
+//not yet implemented inserting the redundant restaurants to DB
 function insertAndRemoveRedundantRestaurants(restaurants){
-  //console.log(restaurants);
-  var promises = restaurants
-    .filter(function(restaurant) {
-        if (restaurant.place_id == null) {
-          return false; // skip
-        }
-        return true;
-    })
-    .map((restaurant) => {
-        return restaurant;
-      })
-
-  return Promise.all(promises).then(results => {
-    return results;
+  let restaurantsWithPlaceID = [];
+  let restaurantsWithOutPlaceID = restaurants.filter(restaurant => {
+    if(!restaurant.place_id && !restaurant.in_db) {
+      return true;
+    }
+    if(restaurant.place_id){
+        restaurantsWithPlaceID.push(restaurant);
+    }
+    return false;
   });
+  restaurantModel.createRestaurants(restaurantsWithOutPlaceID)
+  .then(results => {
+    console.log("Successfully serialized restaurants", results);
+  })
+  .catch(err => {
+    console.log("Failed to serialize restaurants", err);
+  });
+
+  return restaurantsWithPlaceID;
 }
 
 //filter restaurants result with DB to avoid redundant requests

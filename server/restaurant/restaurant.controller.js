@@ -4313,9 +4313,9 @@ class restaurantController {
               return restaurantService.createRestaurants(restaurants);
 
             })
-            .then(done => logger.info(`Finished updating restaurants into the DB`))
+            .then(done => logger.info(`Finished updating restaurants into the DB `, done))
             .catch(err => {
-                logger.error("Failed to retrieve restaurants", err);
+                logger.error("Failed to retrieve restaurants 100", err);
                 res.send("Failed to retrieve restaurants").status(400);
             });
 
