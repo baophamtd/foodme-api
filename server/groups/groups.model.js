@@ -7,7 +7,42 @@ class groupModel {
         helpers.bindAll(this);
     }
 
-    createGroup(groupData) {
+    createGroup(group) {
+        const filter = {
+            $or: [
+                 {group_id: group.id},
+            ]
+        };
+
+        const set = {
+            $set: group
+        }
+
+        db.collection('groups').findOneAndUpdate(
+            filter, set, {upsert: true, returnNewDocument: true}
+        );
+    }
+
+    createInvite(memberId, groupId) {
+        const filter = {
+            $or: [
+                {invite_id: `${memberId}_${groupId}`}
+            ]
+        }
+
+        const set = {
+            $set: {
+                memberId,
+                groupId
+            }
+        }
+
+        db.collection('invites').findOneAndUpdate(
+            filter, set, {upsert: true, returnNewDocument: true}
+        );
+    }
+
+    deleteInvite(memberId, groupId) {
 
     }
 

@@ -10,7 +10,28 @@ class groupService {
             .then(json => jsonToGroup)
     }
 
+    createGroup({groupName, invites, members, userId}) {
+        let group = Group({
+            owner: userId,
+            name: groupName,
+            members: members,
+            invited: invites,
+            creationDate: new Date().getTime(),
+        })
+        return GroupModel.createGroup(group)
+        .then(success => {
+            return group;
+        })
+        .catch(err => {
+            return false;
+        })
+    }
+
     updateGroup(groupId, groupData) {
+
+    }
+
+    sendGroupInvite(userId) {
 
     }
 }

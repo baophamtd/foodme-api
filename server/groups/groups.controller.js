@@ -17,12 +17,12 @@ class groupController {
     /**
      * Retrieve information about a list of groups
      * @method POST
-     * @param {int} id
+     * @param {array:int} id
      * @returns {Group} the group with the corresponding id, or a 404
      **/
     getGroups(req, res) {
-        const userId = req.params.id;
-        GroupService.get([userId])
+        const {id} = req.params;
+        GroupService.get(id)
             .then(groups => stripGroups)
             .then(strippedGroups => {
                 res.json(strippedGroups);
@@ -41,6 +41,26 @@ class groupController {
      * @returns {boolean} if the group has been successfully created
      */
     createGroup(req, res) {
+        let { groupName, invites, members, userId } = req.params;
+
+        GroupsService.createGroup({groupName, invites, members, userId})
+        .then(group => {
+            const sendInvites = GroupService.sendInvites(invites);
+            const addGroupToUser = GroupService.addGroupToUser(userId, group);
+            Promise.all([sendInvites, addGroupToUser])
+            .then(() => {
+                res.status(200);
+                res.send("Group Created.");
+            })
+            .catch(err => {
+                logger.err("Failed to create group", err)
+            })
+
+        })
+        .catch(err => {
+            res.status(409);
+            res.send("")
+        })
 
         return "createGroup";
     }
