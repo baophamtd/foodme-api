@@ -4,6 +4,7 @@ const restaurantModel = require('./restaurant.model');
 const googleService = require('../google/google.service');
 const yelpService = require('../yelp/yelp.service');
 const Restaurant = require('./restaurant.object');
+const returnLimit = config.YELP.RETURN_LIMIT;
 
 class restaurantService {
 
@@ -48,60 +49,52 @@ class restaurantService {
     }
 
     searchForRestaurants({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth}) {
-        let googleRestaurants = googleService.getPlaces({lat, lng, radius, minPrice, maxPrice})
-            .then(json => json.results)
-            .then(restaurants => googleReduceRestaurants(restaurants))
-            .then(restaurants => {
-              return filterRestaurantsWithDB(restaurants);
-            })
-            /*.then(restaurants => {
-              return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
-            })
-            .then(restaurants =>{
-              return googleService.getDistances({lat, lng, restaurants});
-            })
-            .then(restaurants =>{
-              return googleService.getBusyHours(restaurants);
-            })*/
+      let googleRestaurants = googleService.getPlaces({lat, lng, radius, minPrice, maxPrice});
+      let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice});
 
+      return Promise.all([googleRestaurants, yelpRestaurants])
+      .then(results =>{
+        let nextPageToken = null;
+        let offset = 0;
+        if(results[0].next_page_token !== null){
+          nextPageToken = results[0].next_page_token;
+        }
+        if(results[1].total > returnLimit){
+          offset = returnLimit;
+        }
+        return processResultsFromRequests({googleResults:results[0].results, yelpResults:results[1].businesses, lat, lng, radius, maxHeight, maxWidth})
+        .then(restaurants =>{
+          return ({
+            "restaurants": restaurants,
+            "nextPageToken": nextPageToken,
+            "offset": offset,
+          })
+        })
+      })
+    }
 
-        let yelpRestaurants = yelpService.searchForRestaurants({lat, lng, radius, minPrice})
-            .then(results => results.businesses)
-            .then(restaurants => {
-              //console.log(restaurants);
-              return yelpReduceRestaurants(restaurants)})
-            .then(restaurants => {
-              return filterRestaurantsWithDB(restaurants);
-            })
-            .then(restaurants => {
-              return googleService.getAvailablePlaceID({restaurants, lat, lng, radius});
-            })
-            .then(restaurants =>{
-              return insertAndRemoveRedundantRestaurants(restaurants);
-            })
-            /*.then(restaurants => {
-              return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
-            })
-            .then(restaurants =>{
-              return googleService.getDistances({lat, lng, restaurants});
-            })
-            .then(restaurants =>{
-              return googleService.getBusyHours(restaurants);
-            })*/
-
-        return Promise.all([googleRestaurants, yelpRestaurants])
-            .then(results =>{
-                return mergeSearchResults(results)
-            })
-            .then(restaurants =>{
-                return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
-            })
-            .then(restaurants =>{
-                return googleService.getDistances({lat, lng, restaurants});
-            })
-            .then(restaurants =>{
-                return googleService.getBusyHours(restaurants);
-            })
+    loadNextPage({lat, lng, radius, minPrice, maxHeight, maxWidth, pagetoken, offset}){
+      let googleRestaurants = googleService.getNextPage(pagetoken);
+      let yelpRestaurants = yelpService.getNextRestaurants({lng, lat, radius, minPrice, offset});
+      return Promise.all([googleRestaurants, yelpRestaurants])
+      .then(results =>{
+        let newNextPageToken = null;
+        let newOffset = 0;
+        if(results[0].next_page_token !== null){
+          newNextPageToken = results[0].next_page_token;
+        }
+        if(results[1].total > offset){
+          newOffset = parseInt(offset,10) + returnLimit;
+        }
+        return processResultsFromRequests({googleResults:results[0].results, yelpResults:results[1].businesses, lat, lng, radius, maxHeight, maxWidth})
+        .then(restaurants =>{
+          return ({
+            "restaurants": restaurants,
+            "nextPageToken": newNextPageToken,
+            "offset": newOffset,
+          })
+        })
+      })
     }
 }
 
@@ -109,13 +102,14 @@ class restaurantService {
 //these restaurants are pulled from Yelp
 //not yet implemented inserting the redundant restaurants to DB
 function insertAndRemoveRedundantRestaurants(restaurants){
+
   let restaurantsWithPlaceID = [];
   let restaurantsWithOutPlaceID = restaurants.filter(restaurant => {
-    if(!restaurant.place_id && !restaurant.in_db) {
-      return true;
-    }
-    if(restaurant.place_id){
+    if(restaurant.place_id !== null){
         restaurantsWithPlaceID.push(restaurant);
+    }
+    if(restaurant.place_id == null && !restaurant.in_db) {
+      return true;
     }
     return false;
   });
@@ -126,7 +120,6 @@ function insertAndRemoveRedundantRestaurants(restaurants){
   .catch(err => {
     console.log("Failed to serialize restaurants", err);
   });
-
   return restaurantsWithPlaceID;
 }
 
@@ -137,6 +130,7 @@ function filterRestaurantsWithDB(restaurants){
       .then(_restaurant =>{
         if(_restaurant){
           _restaurant.in_db = true;
+          _restaurant.open_now = restaurant.open_now;
           return _restaurant;
         }else{
           restaurant.in_db = false;
@@ -239,23 +233,54 @@ function yelpReduceRestaurants(restaurants) {
 //remove unneccessary fields
 function googleReduceRestaurants(restaurants) {
     return restaurants.map(restaurant => {
-        return {
-            id: restaurant.id,
-            place_id: restaurant.place_id,
-            name: restaurant.name,
-            open_now: restaurant.opening_hours.open_now || false,
-            photos: restaurant.photos,
-            location: {
-                lat: restaurant.geometry.location.lat,
-                lng: restaurant.geometry.location.lng,
-            },
-            address: restaurant.vicinity,
-            price: restaurant.price_level || 0,
-            rating: restaurant.rating,
-            types: restaurant.types,
-            //icon: restaurant.icon,
-        };
+      let open_now = true;
+      if(restaurant.opening_hours != null){
+        open_now = restaurant.opening_hours.open_now;
+      }
+      return {
+          id: restaurant.id,
+          place_id: restaurant.place_id,
+          name: restaurant.name,
+          open_now: open_now,
+          photos: restaurant.photos,
+          location: {
+              lat: restaurant.geometry.location.lat,
+              lng: restaurant.geometry.location.lng,
+          },
+          address: restaurant.vicinity,
+          price: restaurant.price_level || 0,
+          rating: restaurant.rating,
+          types: restaurant.types,
+          //icon: restaurant.icon,
+      };
     });
+}
+
+//process results from Google and Yelp returns
+function processResultsFromRequests({googleResults, yelpResults, lat, lng, radius, maxHeight, maxWidth}){
+  let googleRestaurants = filterRestaurantsWithDB(googleReduceRestaurants(googleResults));
+
+  let yelpRestaurants = filterRestaurantsWithDB(yelpReduceRestaurants(yelpResults))
+  .then(restaurants => {
+    return googleService.getAvailablePlaceID({restaurants, lat, lng, radius});
+  })
+  .then(restaurants =>{
+    return insertAndRemoveRedundantRestaurants(restaurants);
+  })
+
+  return Promise.all([googleRestaurants, yelpRestaurants])
+      .then(results =>{
+          return mergeSearchResults(results);
+      })
+      .then(restaurants =>{
+          return googleService.getPhotoUrls({restaurants, maxHeight, maxWidth});
+      })
+      .then(restaurants =>{
+          return googleService.getDistances({lat, lng, restaurants});
+      })
+      .then(restaurants =>{
+          return googleService.getBusyHours(restaurants);
+      })
 }
 
 //helper method to merge results

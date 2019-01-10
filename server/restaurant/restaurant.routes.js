@@ -9,7 +9,8 @@ const controller = new restaurantController();
 
 router.get('/search', controller.getRestaurants);
 router.get('/lookup', controller.lookupRestaurant);
-router.get('/:id', controller.getRestaurant);
+//router.get('/:id', controller.getRestaurant);
+router.get('/loadnextpage', controller.loadNextPage);
 
 router.post('/like/:id', controller.likeRestaurant);
 router.post('/dislike/:id', controller.dislikeRestaurant);

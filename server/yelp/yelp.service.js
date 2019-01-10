@@ -1,4 +1,5 @@
 const apiToken = config.YELP.API_TOKEN;
+const returnLimit = config.YELP.RETURN_LIMIT;
 const yelp = require('yelp-fusion');
 const querystring = require('querystring');
 const client = yelp.client(apiToken);
@@ -32,7 +33,8 @@ class yelpService {
             latitude: lat,
             longitude: lng,
             radius: parseInt(radius),
-            term: "restaurants"
+            term: "restaurants",
+            limit: returnLimit,
         }
 
         if(minPrice > 0) {
@@ -44,6 +46,26 @@ class yelpService {
         const url = `${config.YELP.URL}/businesses/search?${querystring.stringify(query)}`;
         return this.request({url, method:"GET"})
         .then(response => response.json());
+    }
+
+    getNextRestaurants({lng, lat, radius, minPrice, offset}){
+      let query = {
+          latitude: lat,
+          longitude: lng,
+          radius: parseInt(radius),
+          term: "restaurants",
+          limit: returnLimit,
+          offset: offset
+      }
+      if(minPrice > 0) {
+          for(i = 0; i < minPrice; i++) {
+              query.price += '$'
+          }
+      }
+
+      const url = `${config.YELP.URL}/businesses/search?${querystring.stringify(query)}`;
+      return this.request({url, method:"GET"})
+      .then(response => response.json());
     }
 }
 

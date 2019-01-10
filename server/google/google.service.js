@@ -25,7 +25,6 @@ class googleService {
           if(!restaurant.in_db){
             query.input = restaurant.name;
             let searchUrl = `${apiEndPoint}/place/findplacefromtext/json?${querystring.stringify(query)}&locationbias=cirle:${radius}@${lat},${lng}`;
-
             return fetch(searchUrl)
             .then(searchResults => searchResults.json())
             .then((response) => {
@@ -72,6 +71,7 @@ class googleService {
                     if(restaurant.image_url != null){
                       restaurant.image_url = response.result.photos;
                     }else{
+                      //console.log(restaurant);
                       restaurant.photos = response.result.photos;
                     }
                     return restaurant;
@@ -162,6 +162,20 @@ class googleService {
         return results;
       });
 
+    }
+
+    getNextPage(nextPageToken){
+      let query = {
+        key: apiToken,
+        pagetoken: nextPageToken,
+      }
+      let url = `${apiEndPoint}/place/nearbysearch/json?${querystring.stringify(query)}`;
+      console.log(url);
+      return fetch(url)
+            .then(res => res.json())
+            .catch(err => {
+                console.log("Failed to retrieve next page data", err);
+            })
     }
 }
 

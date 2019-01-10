@@ -4267,13 +4267,14 @@ class restaurantController {
     constructor() {
         this.getRestaurants = this.getRestaurants.bind(this);
         this.lookupRestaurant = this.lookupRestaurant.bind(this);
+        this.loadNextPage = this.loadNextPage.bind(this);
     }
 
     likeRestaurant(req, res) {
         let {id} = req.params;
         restaurantService.likeRestaurant(id)
             .then(result => {
-                res.send("Succes");
+                res.send("Success");
             })
             .catch(err => {
                 res.send("Failed " + err).status(400);
@@ -4284,7 +4285,7 @@ class restaurantController {
         let {id} = req.params;
         restaurantService.dislikeRestaurant(id)
             .then(result => {
-                res.send("Succes");
+                res.send("Success");
             })
             .catch(err => {
                 res.send("Failed " + err).status(400);
@@ -4295,7 +4296,7 @@ class restaurantController {
         let {id} = req.params;
         restaurantService.favoriteRestaurant(id)
             .then(result => {
-                res.send("Succes");
+                res.send("Success");
             })
             .catch(err => {
                 res.send("Failed").status(400);
@@ -4307,30 +4308,38 @@ class restaurantController {
         let radius = calculateRadius(radiusMiles, radiusKilometers);
         //console.log(restaurants);
         restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
-            //filter out closed restaurants 
-            .then(restaurants => {
-                let openRestaurants = restaurants.filter(restaurant => {
+            //filter out closed restaurants
+            .then(results => {
+              console.log(results.restaurants);
+                let openRestaurants = results.restaurants.filter(restaurant => {
                     if(restaurant.open_now) {
                       return true;
                     }
                     return false;
                   });
 
-                res.send(openRestaurants);
-                return restaurantService.createRestaurants(restaurants);
+                res.send({
+                          "restaurants": openRestaurants,
+                          "pagetoken": results.nextPageToken,
+                          "offset": results.offset,
+                        });
+                return restaurantService.createRestaurants(results.restaurants);
 
             })
             .then(done => logger.info(`Finished updating restaurants into the DB `, done))
             .catch(err => {
-                logger.error("Failed to retrieve restaurants 100", err);
+                logger.error("Failed to retrieve restaurants", err);
                 res.send("Failed to retrieve restaurants").status(400);
             });
 
     }
 
+    /**
+    ** ask Shinjo
+    **/
     getRestaurant(req, res) {
-        let {id} = req.params;
-        restaurantService.getRestaurant(id)
+        let {place_id, id} = req.params;
+        restaurantService.getRestaurantByID(place_id, id)
             .then(restaurant => {
                 if(restaurant)
                     res.send(restHelper.buildResponse(null, restaurant));
@@ -4340,6 +4349,34 @@ class restaurantController {
             .catch(err => {
                 res.send(restHelper.buildResponse(err, [])).status(500);
             });
+    }
+
+    loadNextPage(req, res){
+        let {lat, lng, minPrice, radiusMiles, radiusKilometers, maxWidth, maxHeight, pagetoken, offset} = req.query;
+        let radius = calculateRadius(radiusMiles, radiusKilometers);
+        restaurantService.loadNextPage({lat, lng, radius, minPrice, pagetoken, offset})
+        .then(results => {
+          console.log(results.restaurants);
+            let openRestaurants = results.restaurants.filter(restaurant => {
+                if(restaurant.open_now) {
+                  return true;
+                }
+                return false;
+              });
+
+            res.send({
+                      "restaurants": openRestaurants,
+                      "pagetoken": results.nextPageToken,
+                      "offset": results.offset,
+                    });
+            return restaurantService.createRestaurants(results.restaurants);
+
+        })
+        .then(done => logger.info(`Finished updating restaurants into the DB `, done))
+        .catch(err => {
+            logger.error("Failed to retrieve restaurants", err);
+            res.send("Failed to retrieve restaurants").status(400);
+        });
     }
 
     createRestaurant(req, res) {
@@ -4354,6 +4391,7 @@ class restaurantController {
         })
       //console.log(result)
     }
+
 }
 
 function calculateRadius(radiusMiles, radiusKilometers)  {
