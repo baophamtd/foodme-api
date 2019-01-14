@@ -23,6 +23,8 @@ class groupModel {
         );
     }
 
+
+    // These can be put on the users object, however, its preferable to create these as a separate table
     createInvite(memberId, groupId) {
         const filter = {
             $or: [
@@ -47,7 +49,7 @@ class groupModel {
     }
 
     deleteGroup() {
-        // We don't actually want to delete the group
+        // We don't actually want to delete the group mark the group as deleted though
         // TODO: return something?
     }
 }

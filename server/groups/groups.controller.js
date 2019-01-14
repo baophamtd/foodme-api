@@ -32,7 +32,6 @@ class groupController {
                 res.status(404);
                 res.send("Failed to find the specified group.");
             })
-        return "getGroups";
     }
 
     /**
@@ -61,8 +60,6 @@ class groupController {
             res.status(409);
             res.send("")
         })
-
-        return "createGroup";
     }
 
 
