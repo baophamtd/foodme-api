@@ -17,6 +17,9 @@ class User {
         //access token
         facebookToken,
 
+        //expiry date
+        facebookTokenExpiryDate,
+
         //array json web token
         foodmeTokens,
 
@@ -35,6 +38,7 @@ class User {
         this.birthday = birthday || null;
         this.facebookId = facebookId || null;
         this.facebookToken = facebookToken || null;
+        this.facebookTokenExpiryDate = facebookTokenExpiryDate || null;
         this.foodmeTokens = foodmeTokens || [];
         this.wentToRestaurantList = wentToRestaurantList || [];
         this.likedRestaurantList = likedRestaurantList || [];

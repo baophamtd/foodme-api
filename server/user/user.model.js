@@ -15,12 +15,13 @@ class userModel {
         logger.error("Failed to create user", error);
       });
       */
-      var filter = {id: user.id}
+      var filter = {facebook_id: user.facebookId}
       var set = {
         $set: {
           id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          first_name: user.firstName,
+          last_name: user.lastName,
+          email: user.email,
           gender: user.gender,
           country: user.country,
           city: user.city,
@@ -29,23 +30,27 @@ class userModel {
           birthday: user.birthday,
 
           //fb user_id
-          facebookId: user.facebookId,
+          facebook_id: user.facebookId,
 
           //access token
-          facebookToken: user.facebookToken,
+          facebook_token: user.facebookToken,
+
+          //fb token expiry date
+          facebook_token_expiry_date: user.facebookTokenExpiryDate,
 
           //array json web token
-          foodmeTokens: user.foodmeTokens,
+          foodme_tokens: user.foodmeTokens,
 
           //list of restaurant id's
-          wentToRestaurantList: user.wentToRestaurantList,
-          likedRestaurantList: user.likedRestaurantList,
-          dislikedRestaurantList: user.dislikedRestaurantList,
+          went_to_restaurant_list: user.wentToRestaurantList,
+          liked_restaurant_list: user.likedRestaurantList,
+          disliked_restaurant_list: user.dislikedRestaurantList,
         }
       }
       return MongoDB.getDB().collection('users').findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
       .then(result =>{
-        return (result.value == null) ? user.id:0;
+        //value == null means no record found, so inserted a new one instead of updating
+        return user.facebookId;
       })
 
     }

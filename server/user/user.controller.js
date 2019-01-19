@@ -1,8 +1,5 @@
-const jwt = require('jsonwebtoken');
-const uniqid = require('uniqid');
-const facebookService = require('../facebook/facebook.service');
 const userService = require('./user.service');
-const User = require('./user.object');
+const restHelper = require('../rest/rest.helper');
 
 class userController {
 
@@ -11,35 +8,21 @@ class userController {
   }
 
   createUser(req, res) {
-    let user = new User({
-      id: uniqid(),
-      firstName: null,
-      lastName:null,
-      gender:null,
-      country:null,
-      city:null,
-      age:null,
-      //ex mm/dd/yyyy or mm/dd
-      birthday:null,
+    let {facebook_id, short_lived_token} = req.body;
 
-      //fb user_id
-      facebookId:null,
-
-      //access token
-      facebookToken:null,
-
-      //array json web token
-      foodmeTokens: [],
-
-      //list of restaurant id's
-      wentToRestaurantList:[],
-      likedRestaurantList:[],
-      dislikedRestaurantList:[],
-    });
-    return userService.createUser(user)
-    .then((result) =>{
+    return userService.createUser(facebook_id, short_lived_token)
+    /*.then((result) =>{
       (result != 0) ? res.send({"id":result}) : res.send("User Existed");
+    })*/
+    .then(result => {
+        if(result)
+            res.send(restHelper.buildResponse(null, result));
+        else
+            res.send(restHelper.buildResponse(null, [])).status(404);
     })
+    .catch(err => {
+        res.send(restHelper.buildResponse(err, [])).status(500);
+    });
   }
 
     /*
