@@ -1,4 +1,5 @@
 const GroupModel = require('./groups.model');
+const UserService = require('../user/user.service');
 const Group = require('./group.object')
 
 class groupService {
@@ -25,6 +26,14 @@ class groupService {
         .catch(err => {
             return false;
         })
+    }
+
+    addGroupToUser(groupId, userId) {
+
+    }
+
+    getGroup(id) {
+        return GroupModel.getGroup(id);
     }
 
     updateGroup(groupId, groupData) {

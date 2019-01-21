@@ -1,5 +1,7 @@
-const helpers = require('../utils/utils.helper');
-const MongoDb = require('../mongodb/mongo.connector');
+const helpers = require('../../utils/utils.helper');
+const MongoDb = require('../../integrations/mongodb/mongo.connector');
+
+COLLECTION = "groups";
 
 class groupModel {
     constructor() {
@@ -42,6 +44,19 @@ class groupModel {
         db.collection('invites').findOneAndUpdate(
             filter, set, {upsert: true, returnNewDocument: true}
         );
+    }
+
+    getGroup(id) {
+        const query = {
+            $or: [
+                {id}
+            ]
+        };
+
+        return MongoDB.getDB().collection(COLLECTION).findOne(query)
+        .then(result => {
+            return result;
+        });
     }
 
     deleteInvite(memberId, groupId) {

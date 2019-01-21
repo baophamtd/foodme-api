@@ -1,10 +1,17 @@
 const userService = require('./user.service');
-const restHelper = require('../rest/rest.helper');
+const restHelper = require('../../rest/rest.helper');
 
 class userController {
 
   constructor() {
       this.createUser = this.createUser.bind(this);
+  }
+
+  getUser(req, res) {
+    userService.getUser(req.params.id)
+    .then(user => {
+      res.send(user);
+    });
   }
 
   createUser(req, res) {

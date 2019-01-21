@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 // Load MongoDB utils
-const MongoDB = require('./mongodb/mongo.connector')
+const MongoDB = require('./integrations/mongodb/mongo.connector')
 
 //Attach middlewares
 app.use(bodyParser.urlencoded({ extended: false }))

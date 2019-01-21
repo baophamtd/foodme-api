@@ -23,6 +23,9 @@ class User {
         //array json web token
         foodmeTokens,
 
+        // groups that the user is a member of
+        groups,
+
         //list of restaurant id's
         wentToRestaurantList,
         likedRestaurantList,
@@ -40,6 +43,7 @@ class User {
         this.facebookToken = facebookToken || null;
         this.facebookTokenExpiryDate = facebookTokenExpiryDate || null;
         this.foodmeTokens = foodmeTokens || [];
+        this.groups = groups || [];
         this.wentToRestaurantList = wentToRestaurantList || [];
         this.likedRestaurantList = likedRestaurantList || [];
         this.dislikedRestaurantList = dislikedRestaurantList || [];
