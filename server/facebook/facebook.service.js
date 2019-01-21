@@ -60,6 +60,7 @@ class facebookService {
       });
 
   }
+
 }
 
 module.exports = new facebookService();
