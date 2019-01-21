@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const connectionModel = require('./connection.model');
-const googleService = require('../google/google.service');
+const googleService = require('../../integrations/google/google.service');
 const Connection = require('./connection.object');
 const WEATHER_API_KEY = 'a3a61defc8d1a149a9276e19249fd38d';
 

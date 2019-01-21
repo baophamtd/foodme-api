@@ -1,5 +1,5 @@
 const connectionService = require('./connection.service');
-const restHelper = require('../rest/rest.helper');
+const restHelper = require('../../rest/rest.helper');
 const Promise = require('bluebird');
 
 class connectionController {

@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 const Promise = require("bluebird");
 const restaurantModel = require('./restaurant.model');
-const googleService = require('../google/google.service');
-const yelpService = require('../yelp/yelp.service');
+const googleService = require('../../integrations/google/google.service');
+const yelpService = require('../../integrations/yelp/yelp.service');
 const Restaurant = require('./restaurant.object');
 const returnLimit = config.YELP.RETURN_LIMIT;
 

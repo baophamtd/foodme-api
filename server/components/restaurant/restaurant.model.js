@@ -1,6 +1,6 @@
 //let db = require('../aws/dynamo.dynasty.connector');
 //let restaurants = db.table('Restaurants');
-const MongoDB = require('../mongodb/mongo.connector');
+const MongoDB = require('../../integrations/mongodb/mongo.connector');
 const assert = require('assert');
 //const Promise = require('bluebird');
 

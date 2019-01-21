@@ -25,8 +25,18 @@ router.put('/update', controller.updateGroup);
 // begin a search
 router.post('/search', controller.beginGroupSearch);
 
+// start an outting
+router.post('/outing', controller.outing);
+
+// suggest a restaurant
+router.post('/outing/suggest', controller.suggestRestaurant)
+
 // Vote for a restaurant and trigger a runoff if needed
-router.post('/search/vote', controller.voteForRestaruant);
+router.post('/outing/vote', controller.voteForRestaurant);
+
+// Confirm
+router.post('/search/confirm', controller.confirmRestaurant);
+
 
 // Poll for group status
 router.get('/poll/:id', controller.poll)

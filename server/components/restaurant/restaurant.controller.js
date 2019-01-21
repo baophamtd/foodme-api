@@ -1,5 +1,5 @@
 const restaurantService = require('./restaurant.service');
-const restHelper = require('../rest/rest.helper');
+const restHelper = require('../../rest/rest.helper');
 const Promise = require('bluebird');
 
 var restaurants = [

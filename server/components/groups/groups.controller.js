@@ -9,10 +9,6 @@ const GroupService = require('./groups.service');
  *
  */
 class groupController {
-    constructor() {
-
-    }
-
 
     /**
      * Retrieve information about a list of groups
@@ -40,7 +36,8 @@ class groupController {
      * @returns {boolean} if the group has been successfully created
      */
     createGroup(req, res) {
-        let { groupName, invites, members, userId } = req.params;
+        let { groupName, invites, userId } = req.params;
+        let members = [userId];
 
         GroupsService.createGroup({groupName, invites, members, userId})
         .then(group => {
@@ -52,14 +49,14 @@ class groupController {
                 res.send("Group Created.");
             })
             .catch(err => {
-                logger.err("Failed to create group", err)
+                logger.err("Failed to create group", err);
             })
 
         })
         .catch(err => {
             res.status(409);
             res.send("")
-        })
+        });
     }
 
 
@@ -98,6 +95,22 @@ class groupController {
     }
 
     poll(req, res) {
+
+    }
+
+    outing(req, res) {
+
+    }
+
+    suggestRestaurant(req, res) {
+
+    }
+
+    voteForRestaurant(req, res) {
+
+    }
+
+    confirmRestaurant(req, res) {
 
     }
 

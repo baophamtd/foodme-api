@@ -1,13 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-//Routers
-let userRouter = require('./user/user.routes');
-let restaurantRouter = require('./restaurant/restaurant.routes');
-let groupsRouter = require('./groups/groups.routes');
-let connectionRouter = require('./user-restaurant-connection/connection.routes');
+// Routers
+let userRouter = require('./components/user/user.routes');
+let restaurantRouter = require('./components/restaurant/restaurant.routes');
+let groupsRouter = require('./components/groups/groups.routes');
+let connectionRouter = require('./components/user-restaurant-connection/connection.routes');
 
-//Attach routers
+// Middlewares
+let authMiddleware = require('./auth/auth.middleware');
+
+// Apply middlewares
+authMiddleware(router);
+
+// Attach routers
 router.use('/user', userRouter);
 router.use('/restaurant', restaurantRouter);
 router.use('/groups', groupsRouter);
