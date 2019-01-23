@@ -27,9 +27,9 @@ class User {
         groups,
 
         //list of restaurant id's
-        wentToRestaurantList,
-        likedRestaurantList,
-        dislikedRestaurantList,
+        wentToRestaurants,
+        likedRestaurants,
+        dislikedRestaurants,
     }) {
         this.id = id;
         this.firstName = firstName;
@@ -44,9 +44,9 @@ class User {
         this.facebookTokenExpiryDate = facebookTokenExpiryDate || null;
         this.foodmeTokens = foodmeTokens || [];
         this.groups = groups || [];
-        this.wentToRestaurantList = wentToRestaurantList || [];
-        this.likedRestaurantList = likedRestaurantList || [];
-        this.dislikedRestaurantList = dislikedRestaurantList || [];
+        this.wentToRestaurants = wentToRestaurants || [];
+        this.likedRestaurants = likedRestaurants || [];
+        this.dislikedRestaurants = dislikedRestaurants || [];
     }
 }
 

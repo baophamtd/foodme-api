@@ -16,8 +16,8 @@ class restaurantService {
         return restaurantModel.createRestaurants(restaurants);
     }
 
-    getRestaurantByID(place_id, id) {
-        return restaurantModel.getRestaurantByID(place_id, id)
+    getRestaurantById(place_id, id) {
+        return restaurantModel.getRestaurantById(place_id, id)
           .then(result => {
             return result;
           })
@@ -103,43 +103,56 @@ class restaurantService {
 //not yet implemented inserting the redundant restaurants to DB
 function insertAndRemoveRedundantRestaurants(restaurants){
 
-  let restaurantsWithPlaceID = [];
-  let restaurantsWithOutPlaceID = restaurants.filter(restaurant => {
-    if(restaurant.place_id !== null){
-        restaurantsWithPlaceID.push(restaurant);
+  let restaurantsWithPlaceId = [];
+  let restaurantsWithOutPlaceId = restaurants.filter(restaurant => {
+    if(restaurant.place_id){
+        restaurantsWithPlaceId.push(restaurant);
     }
     if(restaurant.place_id == null && !restaurant.in_db) {
       return true;
     }
     return false;
   });
-  restaurantModel.createRestaurants(restaurantsWithOutPlaceID)
+  restaurantModel.createRestaurants(restaurantsWithOutPlaceId)
   .then(results => {
     console.log("Successfully serialized restaurants", results);
   })
   .catch(err => {
     console.log("Failed to serialize restaurants", err);
   });
-  return restaurantsWithPlaceID;
+  return restaurantsWithPlaceId;
 }
 
 //filter restaurants result with DB to avoid redundant requests
 function filterRestaurantsWithDB(restaurants){
+  let restaurantsAfterFiltering = [];
   var promises = restaurants.map((restaurant) => {
-      return restaurantModel.getRestaurantByID(restaurant.place_id, restaurant.id)
-      .then(_restaurant =>{
-        if(_restaurant){
-          _restaurant.in_db = true;
-          _restaurant.open_now = restaurant.open_now;
-          return _restaurant;
-        }else{
-          restaurant.in_db = false;
-          return restaurant;
-        }
-      })
-
+      if(restaurant.place_id){
+        return restaurantModel.getRestaurantByPlaceId(restaurant.place_id)
+        .then(restaurantFromDB =>{
+          if(restaurantFromDB){
+            restaurantFromDB.in_db = true;
+            restaurantFromDB.open_now = restaurant.open_now;
+            return restaurantFromDB;
+          }else {
+            restaurant.in_db = false;
+            return restaurant;
+          }
+        })
+      }else{
+        return restaurantModel.getRestaurantById(restaurant.id)
+        .then(restaurantFromDB =>{
+          if(restaurantFromDB){
+            restaurantFromDB.in_db = true;
+            restaurantFromDB.open_now = restaurant.open_now;
+            return restaurantFromDB;
+          }else {
+            restaurant.in_db = false;
+            return restaurant;
+          }
+        })
+      }
   });
-
   return Promise.all(promises).then(results => {
     return results;
   });
@@ -262,7 +275,7 @@ function processResultsFromRequests({googleResults, yelpResults, lat, lng, radiu
 
   let yelpRestaurants = filterRestaurantsWithDB(yelpReduceRestaurants(yelpResults))
   .then(restaurants => {
-    return googleService.getAvailablePlaceID({restaurants, lat, lng, radius});
+    return googleService.getAvailablePlaceId({restaurants, lat, lng, radius});
   })
   .then(restaurants =>{
     return insertAndRemoveRedundantRestaurants(restaurants);

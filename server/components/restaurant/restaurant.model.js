@@ -9,7 +9,7 @@ class restaurantModel {
     constructor() {
       this.db = MongoDB.getDB();
       this.createRestaurants = this.createRestaurants.bind(this);
-      this.getRestaurantByID = this.getRestaurantByID.bind(this);
+      this.getRestaurantById = this.getRestaurantById.bind(this);
     }
 
     updateRestaurant(id, update) {
@@ -18,16 +18,17 @@ class restaurantModel {
 
     createRestaurants(restaurants) {
       var promises = restaurants.map(restaurant =>{
-        var filter = {
-          $or: [
-            {place_id: restaurant.place_id},
-            {id: restaurant.id}
-          ]
+        let filter;
+        if(restaurant.place_id){
+          filter = {placeId: restaurant.place_id}
+        }else{
+          filter = {id: restaurant.id}
         }
+        
         var set = {
           $set: {
-            place_id: restaurant.place_id,  //if place has no place_id, the id field below is from Yelp
-            id: restaurant.id,              //if place_id above is NOT null, this field is from Google
+            placeId: restaurant.place_id,  //if place has place_id, the id field is from Google
+            id: restaurant.id,              //if place_id above is NOT null, this field is from Yelp
             name: restaurant.name,
             photos: restaurant.photos,
             location: restaurant.location,
@@ -40,13 +41,13 @@ class restaurantModel {
             address: restaurant.address,
             price: restaurant.price,
             rating: restaurant.rating,
-            busy_hours: restaurant.busy_hours,
+            busyHours: restaurant.busy_hours || null,
             types: restaurant.types,
-            favorited: restaurant.favorited,
-            likes: restaurant.likes,
-            dislikes: restaurant.dislikes,
-            views: restaurant.views,
-            visits: restaurant.visits,
+            favorited: restaurant.favorited || null,
+            likes: restaurant.likes || null,
+            dislikes: restaurant.dislikes || null,
+            views: restaurant.views || null,
+            visits: restaurant.visits || null,
           }
         }
         return MongoDB.getDB().collection('restaurants').findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
@@ -57,13 +58,22 @@ class restaurantModel {
       });
     }
 
-    //place_id from google and id from yelp
-    getRestaurantByID(place_id, id) {
+    //place_id from google
+    getRestaurantByPlaceId(place_id) {
       var query = {
-          $or: [
-            {place_id: place_id},
-            {id: id}
-          ]}
+          placeId: place_id
+        };
+      return MongoDB.getDB().collection('restaurants').findOne(query)
+      .then(result => {
+        return result;
+      })
+    }
+
+    //and id from yelp
+    getRestaurantById(id){
+      var query = {
+          id: id
+        };
       return MongoDB.getDB().collection('restaurants').findOne(query)
       .then(result => {
         return result;

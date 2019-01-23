@@ -14,7 +14,7 @@ class googleService {
 
     //seach the place found in Yelp on Google API
     //because Yelp Query Rate per Second is only 5
-    getAvailablePlaceID({restaurants, lat, lng, radius}){
+    getAvailablePlaceId({restaurants, lat, lng, radius}){
       let query = {
           key: apiToken,
           fields: 'place_id',
@@ -140,6 +140,9 @@ class googleService {
       }
 
       let promises = restaurants.map(restaurant => {
+        if(restaurant.in_db){
+          restaurant.place_id = restaurant.placeId;
+        }
         query.destinations = `place_id:${restaurant.place_id}`;
         let url = `${apiEndPoint}/distancematrix/json?${querystring.stringify(query).replace('%2C',',').replace('%3A',':')}`;
         return fetch(url)

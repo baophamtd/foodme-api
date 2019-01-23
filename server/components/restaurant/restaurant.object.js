@@ -1,6 +1,6 @@
 class Restaurant {
   constructor({
-    place_id,
+    placeId,
     id,
     name,
     country,
@@ -11,7 +11,7 @@ class Restaurant {
     photos,
     price,
     rating,
-    busy_hours,
+    busyHours,
     //lat, lng
     location,
     types,
@@ -24,7 +24,7 @@ class Restaurant {
     views,
     visits
   }) {
-    this.place_id = place_id || null;
+    this.placeId = placeId || null;
     this.id = id;
     this.name = name;
     this.location = location;
@@ -35,7 +35,7 @@ class Restaurant {
     this.address = address || null;
     this.price = price || 0;
     this.rating = rating || 0;
-    this.busy_hours = null;
+    this.busyHours = null;
     this.photos = photos || ["No Photos"];
     this.types = types || [];
     this.categories = categories || [];

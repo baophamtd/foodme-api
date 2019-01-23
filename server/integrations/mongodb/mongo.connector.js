@@ -1,6 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
-//const uri = `mongodb://${config.MONGO.USERNAME}:${config.MONGO.PASSWORD}@ds019806.mlab.com:19806/foodme`;
-const uri = 'mongodb://localhost:27017/picker';
+const uri = `mongodb://${config.MONGO.USERNAME}:${config.MONGO.PASSWORD}@ds019806.mlab.com:19806/foodme`;
+//const uri = 'mongodb://localhost:27017/picker';
 
 let db;
 

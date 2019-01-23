@@ -47,9 +47,9 @@ class userService {
             foodmeTokens: [],
 
             //list of restaurant id's
-            wentToRestaurantList:[],
-            likedRestaurantList:[],
-            dislikedRestaurantList:[],
+            wentToRestaurants:[],
+            likedRestaurants:[],
+            dislikedRestaurants:[],
           });
           return userModel.createUser(user);
         })

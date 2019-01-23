@@ -18,8 +18,8 @@ class connectionService {
         return Promise.all([temperature])
             .then(results =>{
               let connection  = new Connection({
-                userID: userID,
-                restaurantID: restaurantID,
+                userId: userId,
+                restaurantId: restaurantId,
                 action: action,
                 userLocation: {lat: lat, lng: lng},
                 date: date,

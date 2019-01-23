@@ -1,7 +1,7 @@
 class Connection {
     constructor({
-        userID,
-        restaurantID,
+        userId,
+        restaurantId,
         action,
         userLocation,
         date,
@@ -9,8 +9,8 @@ class Connection {
         temperature,
         distance,
     }) {
-        this.userID = userID;
-        this.restaurantID = restaurantID;
+        this.userId = userId;
+        this.restaurantId = restaurantId;
         this.action = action;
         this.userLocation = userLocation;
         this.date = date;

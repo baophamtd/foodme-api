@@ -18,18 +18,12 @@ class userModel {
      * @params user:User object
      */
     createUser(user) {
-      /*
-      users.insert(user)
-      .catch(function (error){
-        logger.error("Failed to create user", error);
-      });
-      */
-      var filter = {facebook_id: user.facebookId}
+      var filter = {facebookId: user.facebookId}
       var set = {
         $set: {
           id: user.id,
-          first_name: user.firstName,
-          last_name: user.lastName,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           gender: user.gender,
           country: user.country,
@@ -39,23 +33,27 @@ class userModel {
           birthday: user.birthday,
 
           //fb user_id
-          facebook_id: user.facebookId,
+          facebookId: user.facebookId,
 
           //access token
-          facebook_token: user.facebookToken,
+          facebookToken: user.facebookToken,
 
           //fb token expiry date
-          facebook_token_expiry_date: user.facebookTokenExpiryDate,
+          facebookTokenExpiryDate: user.facebookTokenExpiryDate,
 
           //array json web token
-          foodme_tokens: user.foodmeTokens,
+          foodmeTokens: user.foodmeTokens,
+
+          //groupList
+          groups: user.groups,
 
           //list of restaurant id's
-          went_to_restaurant_list: user.wentToRestaurantList,
-          liked_restaurant_list: user.likedRestaurantList,
-          disliked_restaurant_list: user.dislikedRestaurantList,
+          wentToRestaurants: user.wentToRestaurants,
+          likedRestaurants: user.likedRestaurants,
+          dislikedRestaurants: user.dislikedRestaurants,
         }
       }
+
       return MongoDB.getDB().collection(COLLECTION).findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
       .then(result =>{
         //value == null means no record found, so inserted a new one instead of updating
@@ -67,7 +65,7 @@ class userModel {
     getUser(id) {
       const query = {
         $or: [
-          {facebook_id: id}
+          {facebookId: id}
         ]};
         return MongoDB.getDB().collection(COLLECTION).findOne(query)
           .then(result => {
