@@ -105,12 +105,13 @@ function insertAndRemoveRedundantRestaurants(restaurants){
 
   let restaurantsWithPlaceId = [];
   let restaurantsWithOutPlaceId = restaurants.filter(restaurant => {
-    if(restaurant.place_id){
+    if(restaurant.place_id || restaurant.placeId){
         restaurantsWithPlaceId.push(restaurant);
     }
     if(restaurant.place_id == null && !restaurant.in_db) {
       return true;
     }
+
     return false;
   });
   restaurantModel.createRestaurants(restaurantsWithOutPlaceId)
@@ -173,15 +174,26 @@ function mergeSearchResults(results) {
         let key = keyRestaurant(restaurant.location.lat, restaurant.location.lng);
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
+
+            if(restaurant.in_db){
+              restaurant.placeId = restaurant.placeId;
+              restaurant.busyHours = restaurant.busyHours;
+              restaurant.in_db = restaurant.in_db;
+            }
+            if(redundantRestaurant.in_db){
+              restaurant.placeId = redundantRestaurant.placeId;
+              restaurant.busyHours = redundantRestaurant.busyHours;
+              restaurant.in_db = redundantRestaurant.in_db;
+            }
             return {
                 id: restaurant.id,
-                place_id: restaurant.place_id,
+                placeId: restaurant.placeId,
                 name: restaurant.name,
                 open_now: restaurant.open_now,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
                 location: restaurant.location,
                 address: restaurant.address,
-                busy_hours: restaurant.busy_hours,
+                busyHours: restaurant.busyHours,
                 /*
                 city: restaurant.city,
                 country: restaurant.country,
@@ -197,6 +209,7 @@ function mergeSearchResults(results) {
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
                 types: redundantRestaurant.types,
                 distance: restaurant.distance,
+                in_db: restaurant.in_db,
             }
 
             delete dictYelp[key]

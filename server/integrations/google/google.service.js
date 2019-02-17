@@ -52,7 +52,7 @@ class googleService {
             maxheight: maxHeight || 1000,
             fields: 'photo'
         };
-
+        //console.log(restaurants);
         var promises = restaurants
             /*
             .filter(function(restaurant) {
@@ -71,7 +71,8 @@ class googleService {
                     if(restaurant.image_url != null){
                       restaurant.image_url = response.result.photos;
                     }else{
-                      //console.log(restaurant);
+                      console.log('hereeeeeee ', restaurant);
+
                       restaurant.photos = response.result.photos;
                     }
                     return restaurant;
@@ -131,6 +132,7 @@ class googleService {
     }
 
     getDistances({lat, lng, restaurants}){
+      console.log(restaurants.length)
       let query = {
         key: apiToken,
         units: 'imperial',
@@ -148,6 +150,9 @@ class googleService {
         return fetch(url)
           .then(res =>res.json())
           .then(responseJSON =>{
+            if(!responseJSON.rows[0]){
+              console.log(restaurant.name);
+            }
             let distance = responseJSON.rows[0].elements[0].distance;
             let duration = responseJSON.rows[0].elements[0].duration;
             let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
