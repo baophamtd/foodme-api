@@ -195,7 +195,7 @@ function mergeSearchResults(results) {
                 visits: restaurant.visits,
                 price: restaurant.price || redundantRestaurant.price,
                 rating: (restaurant.rating + redundantRestaurant.rating) / 2,
-                types: restaurant.types,
+                types: redundantRestaurant.types,
                 distance: restaurant.distance,
             }
 
@@ -294,6 +294,112 @@ function processResultsFromRequests({googleResults, yelpResults, lat, lng, radiu
       .then(restaurants =>{
           return googleService.getBusyHours(restaurants);
       })
+      .then(restaurants =>{
+        return sortRestaurantsWithAIModel(restaurants);
+      })
+}
+
+function sortRestaurantsWithAIModel(restaurants){
+  let tempCategoryIdDict = {
+    "american": 0,
+    "spanish": 1,
+    "thai": 2,
+    "greek": 3,
+    "french": 4,
+    "vietnamese": 5,
+    "mexican": 6,
+    "indonesian": 7,
+    "indian": 8,
+    "chinese": 9,
+    "german": 10,
+    "filipino": 11,
+    "turkish": 12,
+    "hungarian": 13,
+    "japanese": 14,
+    "irish": 15,
+    "korean": 16,
+    "peruvian": 17,
+    "moroccan": 18,
+    "argentine": 19,
+    "british": 20,
+    "russian": 21,
+    "swiss": 22,
+    "australian": 23,
+    "taiwanese": 24,
+    "portuguese": 25,
+    "iranian": 26,
+    "brazilian": 27,
+    "jamaican": 28,
+    "polish": 29,
+    "colombian": 30,
+    "danish": 31,
+    "ethiopian": 32,
+    "belgian": 33,
+    "czech": 34,
+    "israeli": 35,
+    "malaysian": 36,
+    "swedish": 37,
+    "egyptian": 38,
+    "puerto": 39,
+    "ukrainian": 40,
+    "syrian": 41,
+    "south": 42,
+    "afghan": 43,
+    "cambodian": 44,
+    "chilean": 45,
+    "pakistani": 46,
+    "canadian": 47,
+    "sri": 48,
+    "lithuanian": 49,
+    "bulgarian": 50,
+    "norwegian": 51,
+    "tunisian": 52,
+    "austrian": 53,
+    "nigerian": 54,
+    "basque": 55,
+    "maldivian": 56,
+    "honduran": 57,
+    "mongolian": 58,
+    "serbian": 59,
+    "algerian": 60,
+    "ecuadorian": 61,
+    "burmese": 62,
+    "salvadoran": 63,
+    "tibetan": 64,
+    "icelandic": 65,
+    "bangladeshi": 66,
+    "singaporean": 67,
+    "dutch": 68,
+    "nepalese": 69
+  }
+  let restaurantsWithCategory = restaurants.filter(restaurant => {
+    if(restaurant.types[0].alias){
+
+        console.log(restaurant.types[0].alias);
+
+        return true;
+    }
+    return false;
+  });
+  return restaurantsWithCategory;
+/*
+  let query = {
+      user : 64,
+      location : `${lat},${lng}`,
+      radius,
+      type,
+      keyword : "",
+      minPrice,
+      maxPrice
+  };
+
+  let url = `http://localhost/predict?${querystring.stringify(query)}`;
+  return fetch(url)
+      .then(res => res.json())
+      .catch(err => {
+          console.log("Failed to retrieve data", err);
+      })
+*/
 }
 
 //helper method to merge results
