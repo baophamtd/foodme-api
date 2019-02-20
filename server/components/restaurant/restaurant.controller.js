@@ -4310,7 +4310,7 @@ class restaurantController {
         restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
             //filter out closed restaurants
             .then(results => {
-              //console.log(results.restaurants);
+                //console.log(results.restaurants);
                 let openRestaurants = results.restaurants.filter(restaurant => {
                     if(restaurant.open_now) {
                       return true;
@@ -4356,7 +4356,7 @@ class restaurantController {
         let radius = calculateRadius(radiusMiles, radiusKilometers);
         restaurantService.loadNextPage({lat, lng, radius, minPrice, pagetoken, offset})
         .then(results => {
-          console.log(results.restaurants);
+          //console.log(results.restaurants);
             let openRestaurants = results.restaurants.filter(restaurant => {
                 if(restaurant.open_now) {
                   return true;

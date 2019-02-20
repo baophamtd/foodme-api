@@ -20,14 +20,14 @@ class restaurantModel {
       var promises = restaurants.map(restaurant =>{
         let filter;
         if(restaurant.place_id){
-          filter = {placeId: restaurant.place_id}
+          filter = {place_id: restaurant.place_id}
         }else{
           filter = {id: restaurant.id}
         }
-        
+
         var set = {
           $set: {
-            placeId: restaurant.place_id,  //if place has place_id, the id field is from Google
+            place_id: restaurant.place_id,  //if place has place_id, the id field is from Google
             id: restaurant.id,              //if place_id above is NOT null, this field is from Yelp
             name: restaurant.name,
             photos: restaurant.photos,
@@ -41,7 +41,7 @@ class restaurantModel {
             address: restaurant.address,
             price: restaurant.price,
             rating: restaurant.rating,
-            busyHours: restaurant.busy_hours || null,
+            busy_hours: restaurant.busy_hours || null,
             types: restaurant.types,
             favorited: restaurant.favorited || null,
             likes: restaurant.likes || null,
@@ -61,7 +61,7 @@ class restaurantModel {
     //place_id from google
     getRestaurantByPlaceId(place_id) {
       var query = {
-          placeId: place_id
+          place_id: place_id
         };
       return MongoDB.getDB().collection('restaurants').findOne(query)
       .then(result => {

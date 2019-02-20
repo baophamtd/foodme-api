@@ -6,6 +6,11 @@ const yelpService = require('../../integrations/yelp/yelp.service');
 const Restaurant = require('./restaurant.object');
 const returnLimit = config.YELP.RETURN_LIMIT;
 
+const querystring = require('querystring');
+const fetch = require('node-fetch');
+
+
+
 class restaurantService {
 
     constructor() {
@@ -102,13 +107,14 @@ class restaurantService {
 //these restaurants are pulled from Yelp
 //not yet implemented inserting the redundant restaurants to DB
 function insertAndRemoveRedundantRestaurants(restaurants){
-
+  //console.log("list ", restaurants);
   let restaurantsWithPlaceId = [];
   let restaurantsWithOutPlaceId = restaurants.filter(restaurant => {
-    if(restaurant.place_id || restaurant.placeId){
+    if(restaurant.place_id){
         restaurantsWithPlaceId.push(restaurant);
     }
-    if(restaurant.place_id == null && !restaurant.in_db) {
+    if(restaurant.place_id === null && !restaurant.in_db) {
+      //console.log(restaurant);
       return true;
     }
 
@@ -174,26 +180,26 @@ function mergeSearchResults(results) {
         let key = keyRestaurant(restaurant.location.lat, restaurant.location.lng);
         let redundantRestaurant = dictYelp[key];
         if(redundantRestaurant) {
-
             if(restaurant.in_db){
-              restaurant.placeId = restaurant.placeId;
-              restaurant.busyHours = restaurant.busyHours;
+              restaurant.place_id = restaurant.place_id;
+              restaurant.busy_hours = restaurant.busy_hours;
               restaurant.in_db = restaurant.in_db;
             }
             if(redundantRestaurant.in_db){
-              restaurant.placeId = redundantRestaurant.placeId;
-              restaurant.busyHours = redundantRestaurant.busyHours;
+              restaurant.place_id = redundantRestaurant.place_id;
+              restaurant.busy_hours = redundantRestaurant.busy_hours;
               restaurant.in_db = redundantRestaurant.in_db;
             }
             return {
                 id: restaurant.id,
-                placeId: restaurant.placeId,
+                place_id: restaurant.place_id,
+                place_id: restaurant.place_id,
                 name: restaurant.name,
                 open_now: restaurant.open_now,
                 photos: restaurant.photos.concat(redundantRestaurant.photos),
                 location: restaurant.location,
                 address: restaurant.address,
-                busyHours: restaurant.busyHours,
+                busy_hours: restaurant.busy_hours,
                 /*
                 city: restaurant.city,
                 country: restaurant.country,
@@ -385,34 +391,62 @@ function sortRestaurantsWithAIModel(restaurants){
     "dutch": 68,
     "nepalese": 69
   }
+  let predictedRestaurantCategories = [];
+  let predictedRestaurantIds = [];
   let restaurantsWithCategory = restaurants.filter(restaurant => {
+    let inList = false;
     if(restaurant.types[0].alias){
-
-        console.log(restaurant.types[0].alias);
-
+      restaurant.types.forEach(category => {
+        //console.log(category.alias);
+        if(!inList && tempCategoryIdDict[category.alias]){
+          predictedRestaurantCategories.push(tempCategoryIdDict[category.alias]);
+          predictedRestaurantIds.push(restaurant.place_id);
+          inList = true;
+        }
         return true;
+      });
     }
     return false;
   });
-  return restaurantsWithCategory;
-/*
+
+  //generate random business ids to make predictions as we dont have correlations for this data yet
+  //32516 is the max id
+  let tempBusinessIds = [];
+  while(tempBusinessIds.length < predictedRestaurantCategories.length){
+      let r = Math.floor(Math.random()*32516) + 1;
+      if(tempBusinessIds.indexOf(r) === -1) tempBusinessIds.push(r);
+  }
+
+
   let query = {
       user : 64,
-      location : `${lat},${lng}`,
-      radius,
-      type,
-      keyword : "",
-      minPrice,
-      maxPrice
+      businesses : tempBusinessIds.join(","),
+      categories: predictedRestaurantCategories.join(",")
   };
 
-  let url = `http://localhost/predict?${querystring.stringify(query)}`;
+  let url = `http://localhost:5000/predict?${querystring.stringify(query).replace(/%2C/g,",")}`;
+
   return fetch(url)
       .then(res => res.json())
+      .then(res =>{
+        let predictions = res.prediction.replace(/[[\]]/g,'').split(", ");
+        return restaurants.map(restaurant =>{
+          if (predictedRestaurantIds.includes(restaurant.place_id)){
+            restaurant.predicted_rating = parseFloat(predictions[predictedRestaurantIds.indexOf(restaurant.place_id)]);
+          }else{
+            restaurant.predicted_rating = 0;
+          }
+          return restaurant;
+        })
+
+      })
+      .then(restaurants => {
+        return restaurants.sort(function(a,b) { return b.predicted_rating - a.predicted_rating } );
+      })
       .catch(err => {
           console.log("Failed to retrieve data", err);
       })
-*/
+
 }
 
 //helper method to merge results

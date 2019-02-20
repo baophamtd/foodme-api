@@ -68,11 +68,12 @@ class googleService {
                   return fetch(photoUrl)
                   .then(photoResults => photoResults.json())
                   .then((response) => {
+                    if(response.result === undefined){
+                      console.log(response);
+                    }
                     if(restaurant.image_url != null){
                       restaurant.image_url = response.result.photos;
                     }else{
-                      console.log('hereeeeeee ', restaurant);
-
                       restaurant.photos = response.result.photos;
                     }
                     return restaurant;
@@ -143,7 +144,7 @@ class googleService {
 
       let promises = restaurants.map(restaurant => {
         if(restaurant.in_db){
-          restaurant.place_id = restaurant.placeId;
+          restaurant.place_id = restaurant.place_id;
         }
         query.destinations = `place_id:${restaurant.place_id}`;
         let url = `${apiEndPoint}/distancematrix/json?${querystring.stringify(query).replace('%2C',',').replace('%3A',':')}`;
