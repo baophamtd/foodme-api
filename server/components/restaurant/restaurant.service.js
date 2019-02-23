@@ -8,6 +8,7 @@ const returnLimit = config.YELP.RETURN_LIMIT;
 
 const querystring = require('querystring');
 const fetch = require('node-fetch');
+const WEATHER_API_KEY = 'a3a61defc8d1a149a9276e19249fd38d';
 
 
 
@@ -288,6 +289,25 @@ function googleReduceRestaurants(restaurants) {
     });
 }
 
+function getTemperature({lat, lng, restaurants}){
+  let end_point = "https://api.openweathermap.org/data/2.5/weather?";
+  let query = {
+    lat: lat,
+    lon: lng,
+    appid: WEATHER_API_KEY,
+  }
+
+  let url = `${end_point}${querystring.stringify(query)}`;
+  return fetch(url)
+  .then(result => result.json())
+  .then(responseJSON =>{
+    return restaurants.map(restaurant => {
+      restaurant.temperature = responseJSON.main;
+      return restaurant;
+    })
+  })
+}
+
 //process results from Google and Yelp returns
 function processResultsFromRequests({googleResults, yelpResults, lat, lng, radius, maxHeight, maxWidth}){
   let googleRestaurants = filterRestaurantsWithDB(googleReduceRestaurants(googleResults));
@@ -314,7 +334,10 @@ function processResultsFromRequests({googleResults, yelpResults, lat, lng, radiu
           return googleService.getBusyHours(restaurants);
       })
       .then(restaurants =>{
-        return sortRestaurantsWithAIModel(restaurants);
+          return getTemperature({lat, lng, restaurants});
+      })
+      .then(restaurants =>{
+          return sortRestaurantsWithAIModel(restaurants);
       })
 }
 

@@ -6,7 +6,7 @@ class AuthModel {
 
     getSession(id) {
       const query = {
-          facebookToken: id
+          facebook_token: id
         };
         return MongoDB.getDB().collection(COLLECTION).findOne(query)
           .then(result => {

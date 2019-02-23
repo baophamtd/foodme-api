@@ -22,8 +22,8 @@ class userModel {
       var set = {
         $set: {
           id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          first_name: user.first_name,
+          last_name: user.last_name,
           email: user.email,
           gender: user.gender,
           country: user.country,
@@ -33,31 +33,31 @@ class userModel {
           birthday: user.birthday,
 
           //fb user_id
-          facebookId: user.facebookId,
+          facebook_id: user.facebook_id,
 
           //access token
-          facebookToken: user.facebookToken,
+          facebook_token: user.facebook_token,
 
           //fb token expiry date
-          facebookTokenExpiryDate: user.facebookTokenExpiryDate,
+          facebook_token_expiry_date: user.facebook_token_expiry_date,
 
           //array json web token
-          foodmeTokens: user.foodmeTokens,
+          foodme_tokens: user.foodme_tokens,
 
           //groupList
           groups: user.groups,
 
           //list of restaurant id's
-          wentToRestaurants: user.wentToRestaurants,
-          likedRestaurants: user.likedRestaurants,
-          dislikedRestaurants: user.dislikedRestaurants,
+          went_to_restaurants: user.went_to_restaurants,
+          liked_restaurants: user.liked_restaurants,
+          disliked_restaurants: user.disliked_restaurants,
         }
       }
 
       return MongoDB.getDB().collection(COLLECTION).findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
       .then(result =>{
         //value == null means no record found, so inserted a new one instead of updating
-        return user.facebookId;
+        return user.facebook_id;
       })
 
     }

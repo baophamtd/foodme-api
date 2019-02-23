@@ -16,7 +16,7 @@ class userController {
 
   createUser(req, res) {
     let {facebook_id, short_lived_token} = req.body;
-    console.log(facebook_id);
+    //console.log(facebook_id);
     return userService.createUser(facebook_id, short_lived_token)
     .then(result => {
         if(result)

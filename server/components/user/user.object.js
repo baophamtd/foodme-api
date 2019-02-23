@@ -2,8 +2,8 @@ class User {
     constructor({
         //user's info
         id,
-        firstName,
-        lastName,
+        first_name,
+        last_name,
         gender,
         country,
         city,
@@ -12,41 +12,41 @@ class User {
         birthday,
 
         //fb user_id
-        facebookId,
+        facebook_id,
 
         //access token
-        facebookToken,
+        facebook_token,
 
         //expiry date
-        facebookTokenExpiryDate,
+        facebook_token_expiry_date,
 
         //array json web token
-        foodmeTokens,
+        foodme_tokens,
 
         // groups that the user is a member of
         groups,
 
         //list of restaurant id's
-        wentToRestaurants,
-        likedRestaurants,
-        dislikedRestaurants,
+        went_to_restaurants,
+        liked_restaurants,
+        disliked_restaurants,
     }) {
         this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.first_name = first_name;
+        this.last_name = last_name;
         this.gender = gender;
         this.country = country || null;
         this.city = city || null;
         this.age = age || -1;
         this.birthday = birthday || null;
-        this.facebookId = facebookId || null;
-        this.facebookToken = facebookToken || null;
-        this.facebookTokenExpiryDate = facebookTokenExpiryDate || null;
-        this.foodmeTokens = foodmeTokens || [];
+        this.facebook_id = facebook_id || null;
+        this.facebook_token = facebook_token || null;
+        this.facebook_token_expiry_date = facebook_token_expiry_date || null;
+        this.foodme_tokens = foodme_tokens || [];
         this.groups = groups || [];
-        this.wentToRestaurants = wentToRestaurants || [];
-        this.likedRestaurants = likedRestaurants || [];
-        this.dislikedRestaurants = dislikedRestaurants || [];
+        this.went_to_restaurants = went_to_restaurants || [];
+        this.liked_restaurants = liked_restaurants || [];
+        this.disliked_restaurants = disliked_restaurants || [];
     }
 }
 

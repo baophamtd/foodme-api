@@ -13,7 +13,7 @@ class userService {
     }
 
     createUser(facebookId, shortLivedToken) {
-
+      //console.log(facebookId);
       let facebookToken, facebookTokenExpiryDate;
 
       return facebookService.getLongLivedToken(shortLivedToken)
@@ -25,8 +25,8 @@ class userService {
         .then(userProfile =>{
           let user = new User({
             id: uniqid(),
-            firstName: userProfile.first_name,
-            lastName: userProfile.last_name,
+            first_name: userProfile.first_name,
+            last_name: userProfile.last_name,
             gender: userProfile.gender || null,
             country: userProfile.hometown || null,
             city: userProfile.hometown || null,
@@ -35,21 +35,21 @@ class userService {
             birthday:userProfile.birthday || null,
 
             //fb user_id
-            facebookId:facebookId,
+            facebook_id:facebookId,
 
             //access token
-            facebookToken:facebookToken,
+            facebook_token:facebookToken,
 
             //fb token expiry date
-            facebookTokenExpiryDate: facebookTokenExpiryDate,
+            facebook_token_expiry_date: facebookTokenExpiryDate,
 
             //array json web token
-            foodmeTokens: [],
+            foodme_tokens: [],
 
             //list of restaurant id's
-            wentToRestaurants:[],
-            likedRestaurants:[],
-            dislikedRestaurants:[],
+            went_to_restaurants:[],
+            liked_restaurants:[],
+            disliked_restaurants:[],
           });
           return userModel.createUser(user);
         })

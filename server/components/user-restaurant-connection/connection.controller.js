@@ -8,8 +8,8 @@ class connectionController {
     }
 
     takeAction(req, res) {
-        let {lat, lng, userID, restaurantID, action, date, time, distance} = req.body;
-        return connectionService.takeAction({lat, lng, userID, restaurantID, action, date, time, distance})
+        let {lat, lng, userID, restaurantID, action, date, time, distance, temperature, busyness} = req.body;
+        return connectionService.takeAction({lat, lng, userID, restaurantID, action, date, time, distance, temperature, busyness})
             .then(result => {
               (result != 0) ? res.send("success") : res.send("failure");
             })

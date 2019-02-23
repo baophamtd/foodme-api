@@ -8,6 +8,7 @@ class Connection {
         time,
         temperature,
         distance,
+        busyness,
     }) {
         this.user_id = user_id;
         this.restaurant_id = restaurant_id;
@@ -17,6 +18,7 @@ class Connection {
         this.time = time;
         this.temperature = temperature;
         this.distance = distance;
+        this.busyness = busyness;
     }
 }
 
