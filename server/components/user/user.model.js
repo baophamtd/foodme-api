@@ -18,7 +18,7 @@ class userModel {
      * @params user:User object
      */
     createUser(user) {
-      var filter = {facebookId: user.facebookId}
+      var filter = {facebook_id: user.facebook_id}
       var set = {
         $set: {
           id: user.id,
@@ -65,7 +65,7 @@ class userModel {
     getUser(id) {
       const query = {
         $or: [
-          {facebookId: id}
+          {facebook_id: id}
         ]};
         return MongoDB.getDB().collection(COLLECTION).findOne(query)
           .then(result => {

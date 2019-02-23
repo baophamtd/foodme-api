@@ -52,7 +52,7 @@ class facebookService {
       fields: 'first_name,last_name,email,birthday,gender,hometown,location',
       access_token: accessToken
     }
-    let url = `${apiEndPoint}/${facebookId}?${querystring.stringify(query)}`;
+    let url = `${apiEndPoint}/me?${querystring.stringify(query)}`;
     return fetch(url)
       .then(result => result.json())
       .catch(err => {

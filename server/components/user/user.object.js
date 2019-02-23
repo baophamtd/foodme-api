@@ -37,7 +37,7 @@ class User {
         this.gender = gender;
         this.country = country || null;
         this.city = city || null;
-        this.age = age || -1;
+        this.age = age || null;
         this.birthday = birthday || null;
         this.facebook_id = facebook_id || null;
         this.facebook_token = facebook_token || null;
