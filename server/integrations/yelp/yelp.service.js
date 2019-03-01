@@ -65,7 +65,10 @@ class yelpService {
 
       const url = `${config.YELP.URL}/businesses/search?${querystring.stringify(query)}`;
       return this.request({url, method:"GET"})
-      .then(response => response.json());
+      .then(response => {
+        //console.log(response);
+        return response.json();
+      });
     }
 }
 

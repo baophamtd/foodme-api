@@ -179,7 +179,7 @@ class googleService {
         pagetoken: nextPageToken,
       }
       let url = `${apiEndPoint}/place/nearbysearch/json?${querystring.stringify(query)}`;
-      console.log(url);
+      //console.log(url);
       return fetch(url)
             .then(res => res.json())
             .catch(err => {

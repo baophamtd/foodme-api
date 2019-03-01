@@ -79,7 +79,7 @@ class restaurantService {
       })
     }
 
-    loadNextPage({lat, lng, radius, minPrice, maxHeight, maxWidth, pagetoken, offset}){
+    loadNextPage({lat, lng, radius, minPrice, maxPrice, maxHeight, maxWidth, pagetoken, offset}){
       let googleRestaurants = googleService.getNextPage(pagetoken);
       let yelpRestaurants = yelpService.getNextRestaurants({lng, lat, radius, minPrice, offset});
       return Promise.all([googleRestaurants, yelpRestaurants])
@@ -236,6 +236,7 @@ function mergeSearchResults(results) {
 
 //remove unneccessary fields
 function yelpReduceRestaurants(restaurants) {
+  //console.log(restaurants);
     return restaurants.map(restaurant => {
         return {
             //Old code Shinjo added random 40 bytes id
@@ -311,7 +312,6 @@ function getTemperature({lat, lng, restaurants}){
 //process results from Google and Yelp returns
 function processResultsFromRequests({googleResults, yelpResults, lat, lng, radius, maxHeight, maxWidth}){
   let googleRestaurants = filterRestaurantsWithDB(googleReduceRestaurants(googleResults));
-
   let yelpRestaurants = filterRestaurantsWithDB(yelpReduceRestaurants(yelpResults))
   .then(restaurants => {
     return googleService.getAvailablePlaceId({restaurants, lat, lng, radius});
