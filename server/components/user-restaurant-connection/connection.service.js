@@ -11,10 +11,13 @@ class connectionService {
     }
 
     //user place_id for restaurant
-    takeAction({lat, lng, userID, restaurantID, action, date, time, distance, temperature, busyness}) {
+    takeAction({lat, lng, user_id, restaurant_id, restaurant_price, restaurant_rating, restaurant_category, action, date, time, distance, temperature, busyness}) {
         let connection  = new Connection({
-          user_id: userID,
-          restaurant_id: restaurantID,
+          user_id: user_id,
+          restaurant_id: restaurant_id,
+          restaurant_price: restaurant_price,
+          restaurant_rating: restaurant_rating,
+          restaurant_category: restaurant_category,
           action: action,
           location: {lat: lat, lng: lng},
           date: date,

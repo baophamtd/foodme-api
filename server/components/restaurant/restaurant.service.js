@@ -412,22 +412,60 @@ function sortRestaurantsWithAIModel(restaurants){
     "bangladeshi": 66,
     "singaporean": 67,
     "dutch": 68,
-    "nepalese": 69
+    //"nepalese": 69
   }
-  let predictedRestaurantCategories = [];
+  //let predictedRestaurantCategories = [];
+  let predictedRestaurants = [];
   let predictedRestaurantIds = [];
+  let offset = new Date().getTimezoneOffset() / 60;
+  let localHour = new Date().getHours();
+  let days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  let PSTHour = localHour + offset - 7;
+  PSTHour = PSTHour > 0 ? PSTHour : PSTHour + 24;
   let restaurantsWithCategory = restaurants.filter(restaurant => {
     let inList = false;
+    let restaurantCategory;
     if(restaurant.types[0].alias){
       restaurant.types.forEach(category => {
         //console.log(category.alias);
-        if(!inList && tempCategoryIdDict[category.alias]){
-          predictedRestaurantCategories.push(tempCategoryIdDict[category.alias]);
+        if(!inList){
+          if(tempCategoryIdDict[category.alias]){
+            restaurantCategory = tempCategoryIdDict[category.alias];
+            //predictedRestaurantCategories.push(tempCategoryIdDict[category.alias]);
+          }else{
+            restaurantCategory = 69;
+            //predictedRestaurantCategories.push(69);
+          }
           predictedRestaurantIds.push(restaurant.place_id);
           inList = true;
+          let minutes = 10;
+          if (restaurant.distance.duration && !restaurant.distance.duration.text.includes('hour')){
+                minutes = restaurant.distance.duration.text.replace(" min","").replace("s","");
+          }
+
+          let busyness = 20;
+          if(restaurant.busy_hours !== null && restaurant.busy_hours !== undefined){
+            restaurant.busy_hours.forEach(day =>{
+              if(day.day === days[new Date().getDay()]){
+                day.hours.forEach(hour =>{
+                  if(hour.hour === PSTHour){
+                    busyness = hour.percentage;
+                  }
+                })
+              }
+            })
+          }
+
+          let temp = Math.round((restaurant.temperature.temp - 273.15) * 9/5 + 32);
+
+          let restaurantString = (Math.floor(Math.random()*32516) + 1).toString() + ',' + restaurantCategory +','+ restaurant.price+','+ Math.round(restaurant.rating) + ','+PSTHour+
+          ',' + minutes + ',' + busyness + ',' + temp;
+          predictedRestaurants.push(restaurantString);
+          console.log(restaurantString);
         }
-        return true;
       });
+
+      return true;
     }
     return false;
   });
@@ -435,28 +473,38 @@ function sortRestaurantsWithAIModel(restaurants){
   //generate random business ids to make predictions as we dont have correlations for this data yet
   //32516 is the max id
   let tempBusinessIds = [];
-  while(tempBusinessIds.length < predictedRestaurantCategories.length){
+  while(tempBusinessIds.length < predictedRestaurants.length){
       let r = Math.floor(Math.random()*32516) + 1;
       if(tempBusinessIds.indexOf(r) === -1) tempBusinessIds.push(r);
   }
+  console.log(restaurantsWithCategory.length);
 
-
+  /*
   let query = {
       user : 64,
       businesses : tempBusinessIds.join(","),
       categories: predictedRestaurantCategories.join(",")
   };
-
-  let url = `http://localhost:5000/predict?${querystring.stringify(query).replace(/%2C/g,",")}`;
-
-  return fetch(url)
+  */
+  //let url = `http://localhost:5000/predict?${querystring.stringify(query).replace(/%2C/g,",")}`;
+  let payload = {
+    restaurants: predictedRestaurants,
+    //user_id: 656918098079831
+  }
+  let url = `http://localhost:5000/predict`;
+  console.log(predictedRestaurants);
+  return fetch(url, {method: 'POST', body: JSON.stringify(payload)})
       .then(res => res.json())
       .then(res =>{
-        let predictions = res.prediction.replace(/[[\]]/g,'').split(", ");
+        console.log(res);
+        let predictionRating = res.prediction_rating.replace(/[[\]]/g,'').split(", ");
+        let predictionAction = res.prediction_action.replace(/[[\]]/g,'').split(", ");
         return restaurants.map(restaurant =>{
           if (predictedRestaurantIds.includes(restaurant.place_id)){
-            restaurant.predicted_rating = parseFloat(predictions[predictedRestaurantIds.indexOf(restaurant.place_id)]);
+            restaurant.predicted_rating = parseFloat(predictionRating[predictedRestaurantIds.indexOf(restaurant.place_id)]);
+            restaurant.predicted_action = parseFloat(predictionAction[predictedRestaurantIds.indexOf(restaurant.place_id)]);
           }else{
+            restaurant.predicted_action = 1;
             restaurant.predicted_rating = 0;
           }
           return restaurant;
@@ -464,7 +512,8 @@ function sortRestaurantsWithAIModel(restaurants){
 
       })
       .then(restaurants => {
-        return restaurants.sort(function(a,b) { return b.predicted_rating - a.predicted_rating } );
+        restaurants = restaurants.sort(function(a,b) { return b.predicted_rating - a.predicted_rating } );
+        return restaurants.sort(function(a,b) { return b.predicted_action - a.predicted_action } );
       })
       .catch(err => {
           console.log("Failed to retrieve data", err);
