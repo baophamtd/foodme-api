@@ -7,7 +7,7 @@ class connectionModel {
 
     insertConnection(connection) {
 
-      return MongoDB.getDB().collection('connections').insertOne(connection)
+      return MongoDB.getDB().collection('connections2').insertOne(connection)
       .then(result =>{
         return (result.result.ok == 1)? 1:0;
       })
