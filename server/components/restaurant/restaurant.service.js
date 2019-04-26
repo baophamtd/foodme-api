@@ -493,27 +493,32 @@ function sortRestaurantsWithAIModel(restaurants){
   }
   let url = `http://localhost:5000/predict`;
   console.log(predictedRestaurants);
+  console.log("EHEHEHEHE")
   return fetch(url, {method: 'POST', body: JSON.stringify(payload)})
-      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        return res.json();
+      })
       .then(res =>{
         console.log(res);
         let predictionRating = res.prediction_rating.replace(/[[\]]/g,'').split(", ");
-        let predictionAction = res.prediction_action.replace(/[[\]]/g,'').split(", ");
+        //let predictionAction = res.prediction_action.replace(/[[\]]/g,'').split(", ");
         return restaurants.map(restaurant =>{
           if (predictedRestaurantIds.includes(restaurant.place_id)){
             restaurant.predicted_rating = parseFloat(predictionRating[predictedRestaurantIds.indexOf(restaurant.place_id)]);
-            restaurant.predicted_action = parseFloat(predictionAction[predictedRestaurantIds.indexOf(restaurant.place_id)]);
+            //restaurant.predicted_action = parseFloat(predictionAction[predictedRestaurantIds.indexOf(restaurant.place_id)]);
           }else{
             restaurant.predicted_action = 1;
-            restaurant.predicted_rating = 0;
+            //restaurant.predicted_rating = 0;
           }
           return restaurant;
         })
 
       })
       .then(restaurants => {
-        restaurants = restaurants.sort(function(a,b) { return b.predicted_rating - a.predicted_rating } );
-        return restaurants.sort(function(a,b) { return b.predicted_action - a.predicted_action } );
+        //restaurants =
+        return restaurants.sort(function(a,b) { return b.predicted_rating - a.predicted_rating } );
+        //return restaurants.sort(function(a,b) { return b.predicted_action - a.predicted_action } );
       })
       .catch(err => {
           console.log("Failed to retrieve data", err);
