@@ -11,7 +11,7 @@ let connectionRouter = require('./components/user-restaurant-connection/connecti
 let authMiddleware = require('./auth/auth.middleware');
 
 // Apply middlewares
-authMiddleware(router);
+//authMiddleware(router);
 
 // Attach routers
 router.use('/user', userRouter);

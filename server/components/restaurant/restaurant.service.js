@@ -330,15 +330,19 @@ function processResultsFromRequests({googleResults, yelpResults, lat, lng, radiu
       .then(restaurants =>{
           return googleService.getDistances({lat, lng, restaurants});
       })
+      /*
       .then(restaurants =>{
           return googleService.getBusyHours(restaurants);
       })
+      */
       .then(restaurants =>{
           return getTemperature({lat, lng, restaurants});
       })
+      /*
       .then(restaurants =>{
           return sortRestaurantsWithAIModel(restaurants);
       })
+      */
 }
 
 function sortRestaurantsWithAIModel(restaurants){
