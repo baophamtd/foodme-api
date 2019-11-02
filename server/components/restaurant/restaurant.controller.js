@@ -2,7 +2,7 @@ const restaurantService = require('./restaurant.service');
 const restHelper = require('../../rest/rest.helper');
 const Promise = require('bluebird');
 
-var restaurants = [
+let restaurants = [
     {
         "place_id": "ChIJIe9vfzC7j4ARKMPewN6Czv4",
         "id": "db8178a147741973967b873bd246b1f9f38a6224",
@@ -4310,7 +4310,7 @@ class restaurantController {
         restaurantService.searchForRestaurants({lat, lng, radius, minPrice, maxPrice})
             //filter out closed restaurants
             .then(results => {
-                //console.log(results.restaurants);
+                console.log(results.restaurants);
                 let openRestaurants = results.restaurants.filter(restaurant => {
                     if(restaurant.open_now) {
                       return true;

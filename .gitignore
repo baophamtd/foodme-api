@@ -2,3 +2,5 @@ node_modules
 
 #DynamoDB
 dynamodb
+.vscode
+node_modules

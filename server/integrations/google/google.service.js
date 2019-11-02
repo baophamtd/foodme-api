@@ -7,6 +7,7 @@ const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
 const apiToken = config.GOOGLE.MAPS.API_TOKEN;
 
+
 class googleService {
     constructor() {
 
@@ -28,6 +29,7 @@ class googleService {
             return fetch(searchUrl)
             .then(searchResults => searchResults.json())
             .then((response) => {
+              console.log(response);
               if(response.status !== 'ZERO_RESULTS'){
                 restaurant.place_id = response.candidates[0].place_id;
               }
@@ -154,14 +156,20 @@ class googleService {
             if(!responseJSON.rows[0]){
               console.log(restaurant.name);
             }
-            let distance = responseJSON.rows[0].elements[0].distance;
-            let duration = responseJSON.rows[0].elements[0].duration;
-            let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
+
             let result = {
-              distance,
-              duration,
-              durationInTraffic
+              "distance": { "text": 'unknown', "value": 0 },
+              "duration": { "text": 'unknown', "value": 0 },
+              "duration_in_traffic": { "text": 'unknown', "value": 0 },
             }
+            try{
+              let distance = responseJSON.rows[0].elements[0].distance;
+              let duration = responseJSON.rows[0].elements[0].duration;
+              let durationInTraffic = responseJSON.rows[0].elements[0].duration_in_traffic;
+            }catch(e){
+              console.log("could not get distance response from Google for: ", responseJSON.name);
+            }
+            
             restaurant.distance = result;
             return restaurant;
           })
