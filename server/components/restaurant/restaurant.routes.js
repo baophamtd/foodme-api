@@ -2,18 +2,14 @@
 const express = require('express');
 const router = express.Router();
 
-const restaurantController = new require('./restaurant.controller');
+const restaurantController = require('./restaurant.controller');
 
-//Controllers
-const controller = new restaurantController();
+router.get('/search', restaurantController.searchRestaurants);
+router.get('/photos', restaurantController.getRestaurantPhotos)
+router.get('/loadnextpage', restaurantController.loadNextPage);
 
-router.get('/search', controller.getRestaurants);
-router.get('/lookup', controller.lookupRestaurant);
-//router.get('/:id', controller.getRestaurant);
-router.get('/loadnextpage', controller.loadNextPage);
-
-router.post('/like/:id', controller.likeRestaurant);
-router.post('/dislike/:id', controller.dislikeRestaurant);
-router.post('/favorite/:id', controller.favoriteRestaurant);
+router.post('/like/:id', restaurantController.likeRestaurant);
+router.post('/dislike/:id', restaurantController.dislikeRestaurant);
+router.post('/favorite/:id', restaurantController.favoriteRestaurant);
 
 module.exports = router;

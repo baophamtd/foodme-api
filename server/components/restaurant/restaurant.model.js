@@ -2,83 +2,69 @@
 //let restaurants = db.table('Restaurants');
 const MongoDB = require('../../integrations/mongodb/mongo.connector');
 const assert = require('assert');
-//const Promise = require('bluebird');
+const ObjectID = require('mongodb').ObjectID;
+const Promise = require('bluebird');
 
 
 class restaurantModel {
     constructor() {
       this.db = MongoDB.getDB();
-      this.createRestaurants = this.createRestaurants.bind(this);
-      this.getRestaurantById = this.getRestaurantById.bind(this);
-    }
-
-    updateRestaurant(id, update) {
-        //return restaurants.update(id, update);
     }
 
     createRestaurants(restaurants) {
-      var promises = restaurants.map(restaurant =>{
-        let filter;
-        if(restaurant.place_id){
-          filter = {place_id: restaurant.place_id}
-        }else{
-          filter = {id: restaurant.id}
-        }
-
-        var set = {
-          $set: {
-            place_id: restaurant.place_id,  //if place has place_id, the id field is from Google
-            id: restaurant.id,              //if place_id above is NOT null, this field is from Yelp
-            name: restaurant.name,
-            photos: restaurant.photos,
-            location: restaurant.location,
-            /*
-            country: restaurant.country,
-            state: restaurant.state,
-            city: restaurant.city,
-            zip: restaurant.zip,
-            */
-            address: restaurant.address,
-            price: restaurant.price,
-            rating: restaurant.rating,
-            busy_hours: restaurant.busy_hours || null,
-            types: restaurant.types,
-            favorited: restaurant.favorited || null,
-            likes: restaurant.likes || null,
-            dislikes: restaurant.dislikes || null,
-            views: restaurant.views || null,
-            visits: restaurant.visits || null,
+      let promises = restaurants.map(restaurant =>{
+        return this.getRestaurantById(restaurant._id)
+        .then(restaurantInDb =>{
+          if(restaurantInDb === null){
+            return MongoDB.getDB().collection("restaurants").insertOne(restaurant);
           }
-        }
-        return MongoDB.getDB().collection('restaurants').findOneAndUpdate(filter, set, {upsert:true, returnNewDocument : true })
+        })
       })
-
       return Promise.all(promises).then(results => {
-        return results.length;
+        logger.info(`Finished updating`, results.length, `restaurants into the DB`);
       });
     }
 
-    //place_id from google
-    getRestaurantByPlaceId(place_id) {
-      var query = {
-          place_id: place_id
-        };
+    updateRestaurantPhotos(id, photos){
+      this.updatePartialRestaurant(id, "photos", photos)
+    }
+
+    updatePartialRestaurant(id, key, value) {
+      let _oid = new ObjectID(id);
+      let query = {
+        "_id": _oid
+      };
+      let set = {$set: 
+        {[key]: value}
+      }
+      return MongoDB.getDB().collection("restaurants").updateOne(query, set)
+      .catch(err => {
+        console.log('Error: ' + err);
+      })
+    }
+
+    getRestaurantById(id){
+      let _oid = new ObjectID(id);
+      let query = {
+        "_id": _oid
+      };
       return MongoDB.getDB().collection('restaurants').findOne(query)
       .then(result => {
         return result;
       })
     }
 
-    //and id from yelp
-    getRestaurantById(id){
-      var query = {
-          id: id
-        };
+    //search to avoid dubplicates from google call before inserting
+    getRestaurantByPlaceId(placeId){
+      let query = {
+        "place_id": placeId
+      };
       return MongoDB.getDB().collection('restaurants').findOne(query)
       .then(result => {
         return result;
       })
     }
+
 }
 
 module.exports = new restaurantModel();

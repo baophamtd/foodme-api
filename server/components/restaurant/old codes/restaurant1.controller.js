@@ -4328,6 +4328,7 @@ class restaurantController {
         let radius = calculateRadius(radiusMiles, radiusKilometers);
         restaurantService.loadNextPage({lat, lng, radius, minPrice, pagetoken, offset})
         .then(results => {
+          //console.log(results.restaurants);
             let openRestaurants = results.restaurants.filter(restaurant => {
                 if(restaurant.open_now) {
                   return true;
@@ -4356,6 +4357,23 @@ function calculateRadius(radiusMiles, radiusKilometers)  {
     if(radiusMiles) return radiusMiles * 1609.34;
     if(radiusKilometers) return radiusKilometers * 1000;
     return 1500.0;
+}
+
+function batchCreateRestaurants(restaurants) {
+    return Promise.map(restaurants, restaurant => {
+        restaurantService.createRestaurant(restaurant)
+            .catch(err => { logger.error("Failed to write restaurant to database.", restaurant)})
+    })
+}
+
+function filterRestaurants(restaurants, minPrice, maxPrice, minRating) {
+    return restaurants.filter(restaurant => {
+        let price = restaurant.price;
+        if((price >= minPrice || price == 0) && price <= maxPrice && restaurant.rating >= minRating) {
+            return true;
+        }
+        return false;
+    });
 }
 
 module.exports = new restaurantController();

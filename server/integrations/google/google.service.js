@@ -6,6 +6,8 @@ const busyHours = require('busy-hours');  //this library scraping google data
 const googleConnector = require('./google.connector');
 const apiEndPoint = config.GOOGLE.MAPS.END_POINT;
 const apiToken = config.GOOGLE.MAPS.API_TOKEN;
+const maxHeight = 1000;
+const maxWidth = 1000;
 
 
 class googleService {
@@ -46,16 +48,39 @@ class googleService {
 
     }
 
+    //get single restaurant's photo urls
+    getRestaurantPhotos(place_id){
+      let query = {
+        key: apiToken,
+        maxwidth: maxWidth,
+        maxheight: maxHeight,
+        place_id: place_id,
+        fields: 'photo'
+      };
+
+      let photoEndpoint = `${apiEndPoint}/place/details/json?${querystring.stringify(query)}`;
+
+      return fetch(photoEndpoint)
+                  .then(response => response.json())
+                  .then(response => {
+                    let photos;
+                    photos = response.result.photos || [];
+                    return photos;
+                  })
+    }
+
     getPhotoUrls({restaurants, maxWidth, maxHeight}) {
 
         let query = {
             key: apiToken,
             maxwidth: maxWidth || 1000,
             maxheight: maxHeight || 1000,
+            place_id: place_id,
             fields: 'photo'
         };
-        //console.log(restaurants);
-        var promises = restaurants
+
+        
+        let promises = restaurants
             /*
             .filter(function(restaurant) {
                 if (restaurant.place_id == null) {
@@ -91,7 +116,7 @@ class googleService {
         });
     }
 
-    getPlaces({lng, lat, radius, minPrice, maxPrice}) {
+    getPlaces(lat, lng, radius) {
         let type = "restaurant";
 
         let query = {
@@ -99,17 +124,46 @@ class googleService {
             location : `${lat},${lng}`,
             radius,
             type,
-            keyword : "",
-            minPrice,
-            maxPrice
+            keyword : ""
         };
 
         let url = `${apiEndPoint}/place/nearbysearch/json?${querystring.stringify(query)}`;
         return fetch(url)
-            .then(res => res.json())
-            .catch(err => {
-                console.log("Failed to retrieve data", err);
-            })
+        .then(response => response.json())
+        .then(jsonObj =>{
+          return {
+            "restaurants": this.reduceRestaurants(jsonObj.results),
+            "next_page_token": jsonObj.next_page_token
+          }
+        })
+        .catch(err => {
+            console.log("Failed to retrieve data", err);
+        })
+    }
+
+    //remove unneccessary fields
+    reduceRestaurants(restaurants) {
+      return restaurants.map(restaurant => {
+        let open_now = false;
+        if(restaurant.opening_hours !== null){
+          open_now = restaurant.opening_hours.open_now;
+        }
+        return {
+            id: restaurant.id,
+            place_id: restaurant.place_id,
+            name: restaurant.name,
+            open_now: open_now,
+            photos: restaurant.photos,
+            location: {
+                lat: restaurant.geometry.location.lat,
+                lng: restaurant.geometry.location.lng,
+            },
+            address: restaurant.vicinity,
+            price: restaurant.price_level || 0,
+            rating: restaurant.rating,
+            types: restaurant.types,
+          };
+      });
     }
 
     //this might be illegal
