@@ -1,4 +1,9 @@
-FoodMe nodejs api
+FoodMe Node.js API
+
+Overview
+--------
+
+This project is a backend service for restaurant recommendations. It leverages data from third-party services such as Google and Meta, and utilizes machine learning algorithms to provide personalized recommendations.
 =======
 
 Requirements
