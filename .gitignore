@@ -5,3 +5,4 @@ dynamodb
 .vscode
 node_modules
 .aider*
+config/
