@@ -4,3 +4,4 @@ node_modules
 dynamodb
 .vscode
 node_modules
+.aider*
